@@ -1,0 +1,17 @@
+.ganadores-page {
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px;
+  text-align: center;
+  max-width: 1400px; /* más ancho */
+  margin: 0 auto;
+  background-color: #1f1f1d;
+  color: #ffffff;
+}
+
+.ganadores-page h1 {
+  font-family: "Anton", sans-serif;
+  font-size: 36px;
+  margin-bottom: 30px;
+  color: #ff7e00;
+}

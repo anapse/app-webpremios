@@ -1,0 +1,62 @@
+.boton-registro {
+  display: inline-block;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #ff7e00, #f4c542, #ff7e00);
+  background-size: 200% 200%;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(255, 126, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation: glow 3s ease-in-out infinite;
+}
+
+.boton-registro:hover {
+  color: #00aaff; /* Letras azules al pasar el mouse */
+  transform: scale(1.05);
+  color: #ffffff;
+  box-shadow: 0 0 25px rgba(255, 200, 0, 1);
+}
+
+/* Reflejo animado que se mueve */
+.boton-registro::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+/* Animación para el reflejo */
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Efecto de "glow" constante */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 10px #ff7e00;
+  }
+  50% {
+    box-shadow: 0 0 25px #ffd700, 0 0 35px #ff7e00;
+  }
+  100% {
+    box-shadow: 0 0 10px #ff7e00;
+  }
+}

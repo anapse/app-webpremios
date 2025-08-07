@@ -1,0 +1,53 @@
+.winners-page {
+  background-color: #1f1f1d;
+  color: #ffffff;
+  padding: 2rem;
+  font-family: "Montserrat", sans-serif;
+  text-align: center;
+}
+
+.winners-page h2 {
+  color: #ff7e00;
+  margin: 2rem 0 1rem;
+  font-size: 2rem;
+}
+
+.winners-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+table {
+  width: 100%;
+  min-width: 1000px; /* para que sea más ancha si hay muchos datos */
+  border-collapse: collapse;
+  background-color: #e0dfde;
+  color: #1f1f1d;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin: 0 auto 2rem;
+  text-align: left;
+}
+
+thead {
+  background-color: #ff7e00;
+  color: #ffffff;
+}
+
+th,
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+  font-size: 1rem;
+  white-space: nowrap; /* evita saltos de línea innecesarios */
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f1f1f1;
+}
+
+tbody tr:hover {
+  background-color: #ffe3c4;
+}

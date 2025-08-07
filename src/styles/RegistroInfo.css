@@ -1,0 +1,77 @@
+.registro-info {
+  min-height: calc(100vh - 70px);
+  height: auto;
+  flex: 1;
+  background-color: #1f1f1d;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+  margin: 0;
+}
+
+.registro-info h2 {
+  font-family: "Anton", sans-serif;
+  color: #ff7e00;
+  font-size: 2.5rem;
+}
+
+.paso {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.2rem;
+}
+.detalle {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.2rem;
+}
+.costo {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: -10px;
+}
+
+.paso2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.2rem;
+  margin: 15px;
+}
+.numero {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff7e00;
+  margin: 0;
+}
+.precio {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #f97e00;
+
+  margin: 0;
+}
+.flecha {
+  font-size: 5rem;
+  color: #ff7e00;
+  margin: 0;
+
+  animation: bounce 1.5s infinite;
+}
+.qr-container {
+  text-align: center;
+}
+
+.qr-image {
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(15px);
+  }
+}

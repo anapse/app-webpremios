@@ -1,0 +1,37 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 24px;
+  background-color: #111;
+  color: #fff;
+  overflow: visible;
+  height: 70px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+  font-family: "Anton", sans-serif;
+  font-size: 24px;
+}
+
+.navbar-logo {
+  width: 128px;
+  height: 128px;
+  margin-right: 12px;
+}
+
+.navbar-links a {
+  margin-left: 20px;
+  color: white;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+}
+
+.navbar-links a:hover {
+  text-decoration: none;
+  color: #ff7e00;
+}

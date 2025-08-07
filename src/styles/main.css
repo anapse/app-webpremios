@@ -1,0 +1,122 @@
+/* Reset básico y fuentes */
+body {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  background-color: #1f1f1d;
+  color: #ffffff;
+  width: 100%;
+}
+
+/* Para asegurar que todo se expanda correctamente */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Layout general */
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 40px 20px 20px;
+  border-bottom: 1px solid #e0dfde;
+}
+
+/* Logo y tipografía destacada */
+.logo,
+h1,
+h2,
+h3 {
+  font-family: "Anton", sans-serif;
+}
+
+.logo {
+  font-size: 2.5rem;
+  color: #ff7e00;
+  letter-spacing: 4px;
+  margin: 0;
+}
+
+.tagline {
+  color: #e0dfde;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+/* Sección principal */
+.main {
+  flex: 1;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+/* Títulos */
+.title,
+h2 {
+  font-size: 1.8rem;
+  color: #ff7e00;
+  margin-bottom: 10px;
+}
+
+.price {
+  color: #ffffff;
+  margin-bottom: 30px;
+}
+
+/* Botón */
+.buy-btn {
+  background-color: #ff7e00;
+  border: none;
+  color: #1f1f1d;
+  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  font-family: "Montserrat", sans-serif;
+}
+
+.buy-btn:hover {
+  background-color: #e06f00;
+}
+
+/* Cards */
+.cards {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card {
+  background-color: #2a2a2a;
+  border: 1px solid #ff7e00;
+  padding: 20px;
+  border-radius: 10px;
+  color: #ffffff;
+}
+
+.card h3 {
+  color: #ff7e00;
+  margin-bottom: 10px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #e0dfde;
+  padding: 20px;
+  border-top: 1px solid #ff7e00;
+}

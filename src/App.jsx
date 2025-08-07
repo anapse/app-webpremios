@@ -15,6 +15,7 @@ function App() {
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/ganadores" element={<Winners />} />
         <Route path="/registro" element={<RegistroPage />} />
+        <Route path="*" element={<Home />} />
       </Routes>
     </Router>
   )

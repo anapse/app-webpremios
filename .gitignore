@@ -1,0 +1,11 @@
+# Ignorar dependencias y archivos temporales globales
+node_modules/
+dist/
+*.log
+*.env
+.DS_Store
+.vscode/
+.idea/
+# Ignorar carpetas específicas
+backend/node_modules/
+frontend/node_modules/

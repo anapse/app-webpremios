@@ -1,40 +1,26 @@
-import { useState } from 'react';
 
-const useFetch = () => {
-    const [loading, setLoading] = useState(false);
+import { useState, useEffect } from 'react';
+
+const useFetch = (url) => {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const request = async (url, method = 'GET', data = null) => {
+    useEffect(() => {
+        if (!url) return;
         setLoading(true);
         setError(null);
+        fetch(url)
+            .then((res) => {
+                if (!res.ok) throw new Error('Error al obtener los datos');
+                return res.json();
+            })
+            .then((data) => setData(data))
+            .catch((err) => setError(err.message))
+            .finally(() => setLoading(false));
+    }, [url]);
 
-        try {
-            const options = {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            };
-
-            if (data) {
-                options.body = JSON.stringify(data);
-            }
-
-            const res = await fetch(url, options);
-            const result = await res.json();
-
-            if (!res.ok) throw new Error(result.error || 'Error desconocido');
-
-            return result;
-        } catch (err) {
-            setError(err.message);
-            return null;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return { request, loading, error };
+    return { data, loading, error };
 };
 
 export default useFetch;

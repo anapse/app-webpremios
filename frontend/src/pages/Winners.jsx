@@ -1,14 +1,16 @@
+// Ganadores.jsx
 import useFetch from '../hooks/useFetch';
 import WinnersTable from '../components/WinnersTable';
 import '../styles/Ganadores.css';
 import apiRoutes from '../apiRoutes';
+
 export default function Ganadores() {
   const { data, loading, error } = useFetch(apiRoutes.ganadores);
 
   if (loading) return <p>Cargando ganadores...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
-  // Agrupar por nombre de premio
+  // Agrupar por nombre del premio
   const agrupados = {};
   data?.forEach((g) => {
     const premio = g.premio || 'Sin premio';

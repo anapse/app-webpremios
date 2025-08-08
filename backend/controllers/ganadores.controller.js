@@ -1,9 +1,14 @@
 const { getConnection, sql } = require('../config/db');
 
+
 const getGanadores = async (req, res) => {
     try {
-        const pool = await getConnection(); // ✅ Aquí sí debe ir await
-        const result = await pool.request().query('SELECT * FROM Ganadores');
+        const pool = await getConnection();
+        const result = await pool.request().query(`
+            SELECT g.nombre, g.modelo, g.ticket, g.departamento, p.nombre AS premio
+            FROM Ganadores g
+            LEFT JOIN Premios p ON g.premio_id = p.id
+        `);
         res.json(result.recordset);
     } catch (err) {
         console.error('❌ Error al obtener ganadores:', err.message);

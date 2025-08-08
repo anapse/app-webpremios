@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://l77.237.239.180:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://77.237.239.180:3000/api';
 
 const apiRoutes = {
     base: API_BASE_URL,

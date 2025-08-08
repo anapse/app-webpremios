@@ -1,5 +1,6 @@
 import BotonRegistro from "../components/BotonRegistro"
 import "../styles/main.css"
+import sorteoImg from '../assets/sorteo.png';
 
 export default function Home() {
     return (
@@ -14,7 +15,10 @@ export default function Home() {
                 <p className="price">Compra tu ticket por solo <strong>S/ 40</strong></p>
 
                 <BotonRegistro />
-
+  <img src={sorteoImg}
+        alt="Próximo Sorteo - Primer Sorteo Game Ztore"
+        className="sorteo-banner"
+      />
                 <div className="cards">
                     <div className="card">
                         <h3>🚗 Auto 0KM</h3>

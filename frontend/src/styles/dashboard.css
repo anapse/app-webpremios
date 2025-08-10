@@ -1,0 +1,267 @@
+:root {
+  --color-principal: #ff7e00;
+  --color-principal-hover: #e06f00;
+  --color-fondo: #2a2a2a;
+  --color-texto: #fff;
+  --color-texto-secundario: #1f1f1d;
+  --color-borde: #ff7e00;
+  --fuente-principal: 'Montserrat', sans-serif;
+}
+
+.dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.dashboard-container h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: var(--color-principal);
+  grid-column: 1 / -1;
+}
+
+.sorteo-fecha-container,
+.sorteo-precio-container,
+.sorteo-nombre-container,
+.sorteo-estado-container {
+  background-color: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: left;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  font-family: var(--fuente-principal);
+  color: var(--color-texto);
+}
+
+.sorteo-fecha-container h3,
+.sorteo-precio-container h3,
+.sorteo-nombre-container h3,
+.sorteo-estado-container h3 {
+  color: var(--color-principal);
+  margin-bottom: 15px;
+}
+
+.sorteo-fecha-container input[type="date"],
+.sorteo-precio-container input[type="number"],
+.sorteo-nombre-container input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  font-family: var(--fuente-principal);
+  background-color: var(--color-texto-secundario);
+  color: var(--color-texto);
+  font-size: 1rem;
+}
+
+.sorteo-fecha-container button,
+.sorteo-precio-container button,
+.sorteo-nombre-container button,
+.sorteo-estado-container button {
+  background-color: var(--color-principal);
+  border: none;
+  padding: 10px 20px;
+  color: var(--color-texto-secundario);
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sorteo-fecha-container button:hover,
+.sorteo-precio-container button:hover,
+.sorteo-nombre-container button:hover,
+.sorteo-estado-container button:hover {
+  background-color: var(--color-principal-hover);
+}
+
+.sorteo-fecha-container .mensaje,
+.sorteo-precio-container .mensaje,
+.sorteo-nombre-container .mensaje,
+.sorteo-estado-container .mensaje {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--color-texto);
+}
+
+/* Checkbox personalizado */
+.sorteo-estado-container label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;
+  font-size: 1rem;
+  user-select: none;
+  position: relative;
+}
+
+.sorteo-estado-container input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-checkbox {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-borde);
+  border-radius: 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  fill: transparent;
+}
+
+.custom-checkbox svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--color-borde);
+  stroke-width: 2;
+  fill: transparent;
+  display: none;
+}
+
+.sorteo-estado-container input[type="checkbox"]:checked + .custom-checkbox {
+  background-color: var(--color-principal);
+  border-color: var(--color-principal);
+}
+
+.sorteo-estado-container input[type="checkbox"]:checked + .custom-checkbox svg {
+  display: block;
+  fill: var(--color-texto-secundario);
+  stroke: none;
+}
+/* Agregar al dashboard.css */
+
+/* Estilos para CrearNuevoSorteo */
+/* Card igual que otros componentes */
+.crear-sorteo-form {
+  background-color: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  max-width: 400px;
+  font-family: var(--fuente-principal);
+  color: var(--color-texto);
+}
+
+/* Título dentro de la card */
+.crear-sorteo-form h3 {
+  color: var(--color-principal);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+/* Botón Crear primero */
+.crear-sorteo-form > button {
+  background-color: var(--color-principal);
+  color: var(--color-texto-secundario);
+  border: none;
+  padding: 12px 24px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.crear-sorteo-form > button:hover:not(:disabled) {
+  background-color: var(--color-principal-hover);
+}
+
+/* Contenedor botones Guardar y Cancelar en fila */
+.crear-sorteo-form .botones-accion {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  justify-content: flex-start;
+}
+
+/* Botones Guardar y Cancelar */
+.crear-sorteo-form .botones-accion button {
+  background-color: var(--color-principal);
+  border: none;
+  padding: 10px 20px;
+  color: var(--color-texto-secundario);
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+  font-size: 0.95rem;
+  transition: background-color 0.3s;
+}
+
+.crear-sorteo-form .botones-accion button:hover:not(:disabled) {
+  background-color: var(--color-principal-hover);
+}
+
+.crear-sorteo-form .botones-accion button:last-child {
+  background-color: #555;
+  color: #fff;
+}
+
+.crear-sorteo-form .botones-accion button:last-child:hover:not(:disabled) {
+  background-color: #444;
+}
+
+/* Inputs */
+.crear-sorteo-form input[type="text"],
+.crear-sorteo-form input[type="number"],
+.crear-sorteo-form input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background-color: var(--color-texto-secundario);
+  color: var(--color-texto);
+  box-sizing: border-box;
+}
+
+/* Checkbox label */
+.crear-sorteo-form .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-family: var(--fuente-principal);
+  font-size: 1rem;
+  user-select: none;
+}
+
+.crear-sorteo-form .checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Mensajes */
+.crear-sorteo-form .mensaje {
+  margin-top: 10px;
+  font-family: var(--fuente-principal);
+  color: var(--color-principal);
+}
+.descripcion-sorteo {
+  border: 1px solid var(--color-principal);
+  background-color: rgba(255, 126, 0, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 8px 0 16px;
+  color: var(--color-principal);
+  user-select: none;
+}

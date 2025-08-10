@@ -1,18 +1,29 @@
-// Ganadores.jsx
+import { useState, useEffect } from 'react';
 import useFetch from '../hooks/useFetch';
 import WinnersTable from '../components/WinnersTable';
 import '../styles/Ganadores.css';
 import apiRoutes from '../apiRoutes';
+import SorteoInfo from '../components/SorteoInfo';
 
 export default function Ganadores() {
-  const { data, loading, error } = useFetch(apiRoutes.ganadores);
+  const [sorteoId, setSorteoId] = useState(null);
+  const { data: ganadores, loading, error } = useFetch(
+    sorteoId ? `${apiRoutes.ganadores}?id=${sorteoId}` : null
+  );
+  const { data: ultimoSorteo } = useFetch(apiRoutes.ultimoSorteo);
+useEffect(() => {
 
+  if (ultimoSorteo?.id) setSorteoId(ultimoSorteo.id);
+}, [ultimoSorteo]);
+ 
+
+  if (!sorteoId) return <p>Cargando información del sorteo...</p>;
   if (loading) return <p>Cargando ganadores...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
-  // Agrupar por nombre del premio
+  // Agrupar ganadores por nombre del premio
   const agrupados = {};
-  data?.forEach((g) => {
+  ganadores?.forEach((g) => {
     const premio = g.premio || 'Sin premio';
     if (!agrupados[premio]) agrupados[premio] = [];
     agrupados[premio].push(g);
@@ -20,7 +31,8 @@ export default function Ganadores() {
 
   return (
     <div className="ganadores-page">
-      <h1>🎉 GANADORES DEL 31 de JULIO 🎉</h1>
+   <SorteoInfo titulo={`Ganadores del ${ultimoSorteo?.nombre_sorteo || ''}`} sorteo={ultimoSorteo} />
+
       <WinnersTable data={agrupados} />
     </div>
   );

@@ -1,12 +1,12 @@
+/* Navbar general */
 .navbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 5px 24px;
-  background-color: #111;
-  color: #fff;
-  overflow: visible;
-  height: 70px;
+  justify-content: space-between;
+  background-color: #1f1f1d;
+  padding: 10px 20px;
+  color: white;
+  position: relative;
 }
 
 .navbar-brand {
@@ -14,24 +14,108 @@
   align-items: center;
   text-decoration: none;
   color: white;
-  font-family: "Anton", sans-serif;
-  font-size: 24px;
 }
 
 .navbar-logo {
-  width: 128px;
-  height: 128px;
-  margin-right: 12px;
+  height: 40px;
+  width: 40px;
+}
+
+/* Links desktop */
+.navbar-links {
+  display: flex;
+  gap: 20px;
 }
 
 .navbar-links a {
-  margin-left: 20px;
   color: white;
   text-decoration: none;
-  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
 }
 
 .navbar-links a:hover {
-  text-decoration: none;
   color: #ff7e00;
+}
+
+/* Hamburger button - oculto en desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  gap: 5px;
+  z-index: 1001;
+}
+
+.hamburger .bar {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+/* Animación para cruzar las barras cuando está abierto */
+.hamburger .bar.open:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger .bar.open:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger .bar.open:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+/* Responsive para móvil */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+ background: none;
+  border: none;
+  }
+.hamburger,
+.hamburger:focus,
+.hamburger:hover,
+.hamburger:active {
+  outline: none;
+  box-shadow: none;
+   background-color: transparent !important;
+  border: none !important;
+}
+  .navbar-links {
+    position: absolute;
+    top: 60px;
+    right: 50%;
+    transform: translateX(50%); /* Centrar horizontalmente */
+    background-color: #1f1f1d;
+    flex-direction: column;
+    width: 260px; /* Más ancho */
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 126, 0, 0.5); /* borde más suave/transparente */
+    box-shadow: 0 4px 10px rgba(255, 126, 0, 0.15); /* sombra más ligera */
+    max-height: 240px; /* menos alto */
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+
+  .navbar-links a {
+    margin-bottom: 8px; /* menos espacio */
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255, 126, 0, 0.3); /* línea más sutil */
+    color: white;
+    font-weight: 600;
+  }
+
+  .navbar-links a:last-child {
+    border-bottom: none;
+  }
 }

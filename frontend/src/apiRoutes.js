@@ -1,17 +1,22 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://77.237.239.180:3000/api';
+// Configuración para VPS
+const API_BASE_URL = 'http://77.237.239.180:3000/api';
+
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 const apiRoutes = {
-    base: API_BASE_URL,
-
+    // Sorteos
+    sorteos: `${API_BASE_URL}/sorteos`,
+    sorteoById: (id) => `${API_BASE_URL}/sorteos/${id}`,
+    ultimoSorteo: `${API_BASE_URL}/sorteos/ultimo`,
+    proximoSorteo: `${API_BASE_URL}/sorteos/proximo`,
+    // Ganadores
     ganadores: `${API_BASE_URL}/ganadores`,
-    registrarGanador: `${API_BASE_URL}/ganadores/registrar`,
 
+    // Otros
+    users: `${API_BASE_URL}/users`,
     tickets: `${API_BASE_URL}/tickets`,
-    registrarTicket: `${API_BASE_URL}/tickets/registrar`,
-
-    // puedes seguir agregando así...
-    premios: `${API_BASE_URL}/premios`,
-    usuarios: `${API_BASE_URL}/usuarios`,
 };
 
 export default apiRoutes;
+
+

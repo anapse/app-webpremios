@@ -10,7 +10,7 @@
 
 .dashboard-container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1400px; /* Aumentar el ancho máximo del dashboard */
   margin: 0 auto;
 
   display: grid;
@@ -265,3 +265,223 @@
   color: var(--color-principal);
   user-select: none;
 }
+
+
+/* Premios */
+
+/* Premios Editor - Mejorado */
+.premios-editor-container {
+  background-color: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  font-family: var(--fuente-principal);
+  color: var(--color-texto);
+  width: 100%;
+  max-width: 500px; /* Doble del ancho de una card pequeña (250px) + espacio (30px) */
+  margin: 0 auto;
+  grid-column: span 2;
+}
+
+.premios-editor-container h3 {
+  color: var(--color-principal);
+  margin-bottom: 20px;
+  font-size: 20px; /* Igual que otros títulos */
+  font-weight: bold;
+}
+
+.premio-item {
+  display: grid;
+  grid-template-columns: 2fr 2.5fr 60px 40px; /* Ajustar proporciones para ancho menor */
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 15px;
+  padding: 5px;
+  background-color: var(--color-fondo);
+  border-radius: 10px;
+  border: 1px solid var(--color-borde);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Columnas con títulos individuales */
+.premio-columna {
+  display: flex;
+align-items: center;
+  flex-direction: column;
+}
+
+.premio-columna-titulo {
+  color: var(--color-principal);
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Encabezados de campos - ocultos en desktop */
+.premio-headers {
+  display: none;
+}
+
+/* Contenedor para nombre y descripción en columna */
+.nombre-descripcion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.premio-item input[type="text"] {
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: var(--color-texto-secundario);
+  color: var(--color-texto);
+  font-family: var(--fuente-principal);
+  font-size: 0.7rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.premio-item textarea.descripcion {
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: var(--color-texto-secundario);
+  color: var(--color-texto);
+  font-family: var(--fuente-principal);
+  font-size: 0.7rem;
+  width: 100%;
+  height: 60px;
+  resize: none;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
+/* Campo cantidad más pequeño - solo para 2 dígitos */
+.premio-item input[type="number"].cantidad {
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: var(--color-texto-secundario);
+  color: var(--color-texto);
+  font-family: var(--fuente-principal);
+  font-size: 0.7rem;
+  width: 100%;
+  max-width: 60px; /* Volver al tamaño original */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Botón eliminar más grande */
+.premio-item .btn-eliminar {
+  background-color: #dc3545;
+  border: none;
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.premio-item .btn-eliminar:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Botones principales más pequeños */
+.botonera > button {
+  background-color: var(--color-principal);
+  border: none;
+  padding: 10px 20px; /* Más pequeños */
+  color: var(--color-texto-secundario);
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  align-items: center;
+  transition: background-color 0.3s;
+  font-size: 1rem; /* Tamaño normal */
+}
+
+.premios-editor-container > button:hover:not(:disabled) {
+  background-color: var(--color-principal-hover);
+}
+
+.premios-editor-container .mensaje {
+  margin-top: 15px;
+  font-size: 1rem;
+ 
+  
+  border-radius: 6px;
+ 
+}
+.botonera{
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .premios-editor-container {
+    grid-column: 1 / -1; /* Ocupa todo el ancho en móvil */
+    max-width: 100%;
+    width: 100%;
+    padding: 15px;
+  }
+  
+  .premio-item,
+  .premio-headers {
+    display: block; /* Cambiar a bloque en móvil */
+    grid-template-columns: none;
+    gap: 8px;
+  }
+  
+  .premio-headers > div {
+    display: none; /* Ocultar encabezados globales en móvil */
+  }
+  
+  /* Cada campo con su propio label en móvil */
+  .premio-item > div {
+    margin-bottom: 12px;
+  }
+  
+  .premio-item > div::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: bold;
+    color: var(--color-principal);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  
+  .premio-item input[type="number"].cantidad {
+    max-width: 80px;
+  }
+  
+  .premio-item .btn-eliminar {
+    width: 100%;
+    max-width: 120px;
+    margin: 0 auto;
+    height: 40px;
+  }
+}
+
+/* Para pantallas muy grandes */
+@media (min-width: 1200px) {
+  .premios-editor-container {
+    max-width: 900px; /* Aumentar ligeramente para pantallas grandes */
+  }
+}
+
+/* Eliminar media query innecesaria para pantallas medianas */

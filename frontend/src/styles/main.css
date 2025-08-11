@@ -88,6 +88,24 @@ h2 {
   background-color: #e06f00;
 }
 
+
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #e0dfde;
+  padding: 20px;
+  border-top: 1px solid #ff7e00;
+}
+.sorteo-banner {
+  width: 100%;
+  max-width: 800px; /* Ajusta según tu diseño */
+  height: auto;
+  display: block;
+  margin: 0 auto 20px auto;
+  border-radius: 8px;
+}
 /* Cards */
 .cards {
   margin-top: 40px;
@@ -110,21 +128,4 @@ h2 {
 .card h3 {
   color: #ff7e00;
   margin-bottom: 10px;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  font-size: 0.8rem;
-  color: #e0dfde;
-  padding: 20px;
-  border-top: 1px solid #ff7e00;
-}
-.sorteo-banner {
-  width: 100%;
-  max-width: 800px; /* Ajusta según tu diseño */
-  height: auto;
-  display: block;
-  margin: 0 auto 20px auto;
-  border-radius: 8px;
 }

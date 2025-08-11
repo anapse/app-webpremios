@@ -1,17 +1,29 @@
-import BotonRegistro from "../components/BotonRegistro";
+import React from "react";
 import "../styles/main.css";
-import sorteoImg from '../assets/sorteo.png';
-import useFetch from '../hooks/useFetch';
-import apiRoutes from '../apiRoutes';
-import SorteoInfo from '../components/SorteoInfo';
+import sorteoImg from "../assets/sorteo.png";
+
+import useFetch from "../hooks/useFetch";
+import apiRoutes from "../apiRoutes";
+
+import SorteoInfo from "../components/SorteoInfo";
+import BotonRegistro from "../components/BotonRegistro";
+import PremioCard from "../components/PremioCard";
 
 export default function Home() {
-  const { data, loading, error } = useFetch(apiRoutes.proximoSorteo);
+  // Obtener próximo sorteo
+  const { data: sorteo, loading: loadingSorteo, error: errorSorteo } = useFetch(apiRoutes.proximoSorteo);
 
-  if (loading) return <p>Cargando información del próximo sorteo...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!data) return <p>No hay próximo sorteo disponible.</p>; // <-- Agregado
-console.log('Datos del próximo sorteo:', data);
+  // Obtener premios solo si ya cargó el sorteo y hay id
+  const {
+    data: premiosData,
+    loading: loadingPremios,
+    error: errorPremios,
+  } = useFetch(sorteo ? `${apiRoutes.premios}?sorteo_id=${sorteo.id}` : null);
+
+  if (loadingSorteo) return <p>Cargando información del próximo sorteo...</p>;
+  if (errorSorteo) return <p>Error: {errorSorteo}</p>;
+  if (!sorteo) return <p>No hay próximo sorteo disponible.</p>;
+
   return (
     <div className="container">
       <header className="header">
@@ -20,36 +32,39 @@ console.log('Datos del próximo sorteo:', data);
       </header>
 
       <main className="main">
-<SorteoInfo titulo={data.nombre_sorteo} sorteo={data} />
+        <SorteoInfo titulo={sorteo.nombre_sorteo} sorteo={sorteo} />
         <p className="price">
-          Compra tu ticket por solo <strong>S/ {data.ticket_price}</strong>
+          Compra tu ticket por solo <strong>S/ {sorteo.ticket_price}</strong>
         </p>
 
         <BotonRegistro />
         <img
           src={sorteoImg}
-          alt={`Próximo Sorteo - ${data.nombre_sorteo}`}
+          alt={`Próximo Sorteo - ${sorteo.nombre_sorteo}`}
           className="sorteo-banner"
         />
+
         <div className="cards">
-          <div className="card">
-            <h3>🚗 Auto 0KM</h3>
-            <p>Participa por un auto completamente nuevo</p>
-          </div>
-          <div className="card">
-            <h3>📱 iPhone 15 Pro</h3>
-            <p>También sorteamos tecnología de última generación</p>
-          </div>
-          <div className="card">
-            <h3>💸 S/ 10,000</h3>
-            <p>Y premios en efectivo para 10 ganadores más</p>
-          </div>
+          {loadingPremios && <p>Cargando premios...</p>}
+          {errorPremios && <p>Error cargando premios: {errorPremios}</p>}
+          {!loadingPremios && premiosData && premiosData.premios && premiosData.premios.length === 0 && (
+            <p>No hay premios disponibles.</p>
+          )}
+
+          {!loadingPremios &&
+            premiosData &&
+            premiosData.premios &&
+            premiosData.premios.map((premio) => (
+              <PremioCard
+                key={premio.id}
+                titulo={`${premio.nombre} `}
+                descripcion={premio.descripcion}
+              />
+            ))}
         </div>
       </main>
 
-      <footer className="footer">
-        &copy; 2025 Game Ztore. Todos los derechos reservados.
-      </footer>
+      <footer className="footer">&copy; 2025 Game Ztore. Todos los derechos reservados.</footer>
     </div>
   );
 }

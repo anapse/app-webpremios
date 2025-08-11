@@ -7,6 +7,7 @@ import PrecioTicket from '../components/dasboard/PrecioTicket';
 import SorteoFecha from '../components/dasboard/SorteoFecha';
 import EstadoSorteo from '../components/dasboard/EstadoSorteo';
 import CrearNuevoSorteo from '../components/dasboard/CrearNuevoSorteo';
+import PremiosEditor from '../components/dasboard/PremiosEditor';
 
 const Dashboard = () => {
   // Estado para el sorteo activo / actual
@@ -50,6 +51,7 @@ const Dashboard = () => {
           <PrecioTicket sorteo={sorteoActual} setSorteo={setSorteoActual} />
           <SorteoFecha sorteo={sorteoActual} setSorteo={setSorteoActual} />
           <EstadoSorteo sorteo={sorteoActual} setSorteo={setSorteoActual} />
+          <PremiosEditor sorteo={sorteoActual} setSorteo={setSorteoActual} />
         </>
       )}
     </div>

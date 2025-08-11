@@ -5,16 +5,17 @@ const usePatch = (url) => {
     const [error, setError] = useState(null);
     const [data, setData] = useState(null);
 
-    const patchData = async (body) => {
-        if (!url) {
-            setError('URL no proporcionada');
+    // Ahora recibe id y body para formar URL dinámica
+    const patchData = async (id, body) => {
+        if (!url || !id) {
+            setError('URL o ID no proporcionados');
             return null;
         }
 
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(url, {
+            const res = await fetch(`${url}/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),

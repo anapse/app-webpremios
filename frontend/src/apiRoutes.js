@@ -1,7 +1,7 @@
 // Configuración para VPS
 const API_BASE_URL = 'http://77.237.239.180:3000/api';
 
-console.log('🔗 API Base URL:', API_BASE_URL);
+
 
 const apiRoutes = {
     // Sorteos
@@ -11,7 +11,7 @@ const apiRoutes = {
     proximoSorteo: `${API_BASE_URL}/sorteos/proximo`,
     // Ganadores
     ganadores: `${API_BASE_URL}/ganadores`,
-
+    premios: `${API_BASE_URL}/premios`,
     // Otros
     users: `${API_BASE_URL}/users`,
     tickets: `${API_BASE_URL}/tickets`,

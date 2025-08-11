@@ -6,7 +6,7 @@ import '../../styles/dashboard.css';
 function formatDayMonth(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
-  return d.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
+  return d.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
 }
 
 const EstadoSorteo = ({ sorteo, setSorteo }) => {
@@ -48,6 +48,11 @@ const EstadoSorteo = ({ sorteo, setSorteo }) => {
           checked={estado}
           onChange={() => setEstado(!estado)}
         />
+        <span className="custom-checkbox">
+          <svg viewBox="0 0 24 24">
+            <path d="M20.285 6.709l-11.39 11.39-5.89-5.89 1.41-1.41 4.48 4.48 9.98-9.98z" />
+          </svg>
+        </span>{' '}
         Activo
       </label>
       <br />

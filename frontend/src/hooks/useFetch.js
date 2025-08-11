@@ -11,7 +11,6 @@ const useFetch = (url) => {
             return;
         }
 
-        console.log('🔄 Fetching from VPS:', url);
         setLoading(true);
         setError(null);
 
@@ -25,14 +24,14 @@ const useFetch = (url) => {
             // Timeout de 10 segundos
         })
             .then((res) => {
-                console.log('📡 VPS Response status:', res.status, 'for', url);
+
                 if (!res.ok) {
                     throw new Error(`HTTP ${res.status}: ${res.statusText}`);
                 }
                 return res.json();
             })
             .then((data) => {
-                console.log('✅ Data received from VPS:', data);
+
                 setData(data);
             })
             .catch((err) => {

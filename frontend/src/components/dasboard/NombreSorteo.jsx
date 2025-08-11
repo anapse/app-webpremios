@@ -13,7 +13,7 @@ const NombreSorteo = ({ sorteo, setSorteo }) => {
   const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
-    console.log('Sorteo data:', sorteo);
+ 
     if (sorteo?.nombre_sorteo) setNombre(sorteo.nombre_sorteo);
   }, [sorteo]);
 

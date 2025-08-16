@@ -6,7 +6,7 @@ exports.createTicket = async (req, res) => {
 
         const pool = getConnection();
 
-        // Insertar el ticket (sin sorteo_id por ahora)
+        // Insertar el ticket
         const insertResult = await pool.request()
             .input('dni', sql.VarChar, dni)
             .input('nombres', sql.VarChar, nombres)
@@ -15,16 +15,16 @@ exports.createTicket = async (req, res) => {
             .input('token_yape', sql.VarChar, token_yape)
             .input('id_transaccion', sql.VarChar, id_transaccion)
             .input('estado_pago', sql.VarChar, estado_pago)
+            .input('sorteo_id', sql.Int, sorteo_id)
             .query(`
-        INSERT INTO tickets (dni, nombres, telefono, departamento, token_yape, id_transaccion, estado_pago, fecha)
+        INSERT INTO tickets (dni, nombres, telefono, departamento, token_yape, id_transaccion, estado_pago, sorteo_id, fecha)
         OUTPUT INSERTED.id AS ticketId
-        VALUES (@dni, @nombres, @telefono, @departamento, @token_yape, @id_transaccion, @estado_pago, GETDATE())
+        VALUES (@dni, @nombres, @telefono, @departamento, @token_yape, @id_transaccion, @estado_pago, @sorteo_id, GETDATE())
       `);
 
         const ticketId = insertResult.recordset[0].ticketId;
 
-        // Generar código de ticket con sorteo_id fijo hasta agregar la columna
-        const sorteo_id = 1; // Temporal - será reemplazado cuando agregues la columna sorteo_id
+        // Generar código de ticket con el ID del sorteo
         const codigo_ticket = `GZP${sorteo_id.toString().padStart(3, '0')}TK${ticketId.toString().padStart(4, '0')}`;
 
         await pool.request()
@@ -48,19 +48,22 @@ exports.getTickets = async (req, res) => {
 
         const result = await pool.request().query(`
       SELECT 
-        id,
-        codigo_ticket,
-        dni,
-        nombres,
-        telefono,
-        departamento,
-        comprobante_url,
-        estado_pago,
-        fecha,
-        token_yape,
-        id_transaccion
-      FROM tickets
-      ORDER BY id DESC
+        t.id,
+        t.codigo_ticket,
+        t.dni,
+        t.nombres,
+        t.telefono,
+        t.departamento,
+        t.comprobante_url,
+        t.estado_pago,
+        t.fecha,
+        t.sorteo_id,
+        s.nombre_sorteo,
+        s.fecha_sorteo,
+        s.estado_sorteo
+      FROM tickets t
+      LEFT JOIN sorteo_config s ON t.sorteo_id = s.id
+      ORDER BY t.id DESC
     `);
 
         res.json(result.recordset);
@@ -80,20 +83,23 @@ exports.getTicketsByDni = async (req, res) => {
             .input('dni', sql.VarChar, dni)
             .query(`
                 SELECT 
-                    id,
-                    codigo_ticket,
-                    dni,
-                    nombres,
-                    telefono,
-                    departamento,
-                    comprobante_url,
-                    estado_pago,
-                    fecha,
-                    token_yape,
-                    id_transaccion
-                FROM tickets
-                WHERE dni = @dni
-                ORDER BY fecha DESC
+                    t.id,
+                    t.codigo_ticket,
+                    t.dni,
+                    t.nombres,
+                    t.telefono,
+                    t.departamento,
+                    t.comprobante_url,
+                    t.estado_pago,
+                    t.fecha,
+                    t.sorteo_id,
+                    s.nombre_sorteo,
+                    s.fecha_sorteo,
+                    s.estado_sorteo
+                FROM tickets t
+                LEFT JOIN sorteo_config s ON t.sorteo_id = s.id
+                WHERE t.dni = @dni
+                ORDER BY t.fecha DESC
             `);
 
         res.json(result.recordset);
@@ -113,19 +119,22 @@ exports.getTicketByCode = async (req, res) => {
             .input('codigo_ticket', sql.VarChar, codigo)
             .query(`
                 SELECT 
-                    id,
-                    codigo_ticket,
-                    dni,
-                    nombres,
-                    telefono,
-                    departamento,
-                    comprobante_url,
-                    estado_pago,
-                    fecha,
-                    token_yape,
-                    id_transaccion
-                FROM tickets
-                WHERE codigo_ticket = @codigo_ticket
+                    t.id,
+                    t.codigo_ticket,
+                    t.dni,
+                    t.nombres,
+                    t.telefono,
+                    t.departamento,
+                    t.comprobante_url,
+                    t.estado_pago,
+                    t.fecha,
+                    t.sorteo_id,
+                    s.nombre_sorteo,
+                    s.fecha_sorteo,
+                    s.estado_sorteo
+                FROM tickets t
+                LEFT JOIN sorteo_config s ON t.sorteo_id = s.id
+                WHERE t.codigo_ticket = @codigo_ticket
             `);
 
         if (!result.recordset.length) {

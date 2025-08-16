@@ -15,6 +15,19 @@ body,
   width: 100%;
 }
 
+/* Animación para skeletons */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /* Layout general */
 .container {
   display: flex;
@@ -90,14 +103,7 @@ h2 {
 
 
 
-/* Footer */
-.footer {
-  text-align: center;
-  font-size: 0.8rem;
-  color: #e0dfde;
-  padding: 20px;
-  border-top: 1px solid #ff7e00;
-}
+
 .sorteo-banner {
   width: 100%;
   max-width: 800px; /* Ajusta según tu diseño */
@@ -128,4 +134,57 @@ h2 {
 .card h3 {
   color: #ff7e00;
   margin-bottom: 10px;
+}
+.footer {
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #ff7e00;
+  background-color: #1f1f1d;
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.footer-cta {
+  background-color: #ff7e00;
+  color: #1f1f1d;
+  padding: 10px 18px;
+  border-radius: 30px;
+  text-decoration: none;
+
+  
+  transition: background-color 0.3s ease;
+}
+
+.footer-cta:hover {
+  background-color: #e06f00;
+}
+
+@media (min-width: 768px) {
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+.whatsapp-float {
+  position: fixed;
+  top: 30%;
+  right: 20px;
+  z-index: 1000;
+  background-color: transparent;
+}
+
+.whatsapp-float img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.whatsapp-float img:hover {
+  transform: scale(1.5);
 }

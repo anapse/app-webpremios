@@ -10,19 +10,80 @@ import BotonRegistro from "../components/BotonRegistro";
 import PremioCard from "../components/PremioCard";
 
 export default function Home() {
+
   // Obtener próximo sorteo
-  const { data: sorteo, loading: loadingSorteo, error: errorSorteo } = useFetch(apiRoutes.proximoSorteo);
+  const { data: sorteo, loading: loadingSorteo, error: errorSorteo } = useFetch(apiRoutes.proximoSorteo, { useGlobalLoader: true });
 
   // Obtener premios solo si ya cargó el sorteo y hay id
   const {
     data: premiosData,
     loading: loadingPremios,
     error: errorPremios,
-  } = useFetch(sorteo ? `${apiRoutes.premios}?sorteo_id=${sorteo.id}` : null);
+  } = useFetch(sorteo ? `${apiRoutes.premios}?sorteo_id=${sorteo.id}` : null, { useGlobalLoader: true });
 
-  if (loadingSorteo) return <p>Cargando información del próximo sorteo...</p>;
-  if (errorSorteo) return <p>Error: {errorSorteo}</p>;
-  if (!sorteo) return <p>No hay próximo sorteo disponible.</p>;
+  // Loading optimizado - mostrar estructura básica mientras carga
+  if (loadingSorteo) {
+    return (
+      <div className="container">
+        <header className="header">
+          <h1 className="logo">Game Ztore</h1>
+          <p className="tagline">Participa y gana premios cada mes</p>
+        </header>
+        <main className="main">
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div className="sorteo-info-skeleton">
+              <div style={{ 
+                height: '40px', 
+                backgroundColor: '#333', 
+                borderRadius: '8px', 
+                marginBottom: '20px',
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }}></div>
+              <div style={{ 
+                height: '20px', 
+                backgroundColor: '#333', 
+                borderRadius: '8px',
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }}></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (errorSorteo) {
+    return (
+      <div className="container">
+        <header className="header">
+          <h1 className="logo">Game Ztore</h1>
+          <p className="tagline">Participar y ganar premios cada mes</p>
+        </header>
+        <main className="main">
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <p>❌ Error: {errorSorteo}</p>
+            <button onClick={() => window.location.reload()}>🔄 Reintentar</button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!sorteo) {
+    return (
+      <div className="container">
+        <header className="header">
+          <h1 className="logo">Game Ztore</h1>
+          <p className="tagline">Participar y ganar premios cada mes</p>
+        </header>
+        <main className="main">
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <p>📅 No hay próximo sorteo disponible.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -64,7 +125,6 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="footer">&copy; 2025 Game Ztore. Todos los derechos reservados.</footer>
-    </div>
+        </div>
   );
 }

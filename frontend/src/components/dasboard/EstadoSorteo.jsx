@@ -10,9 +10,7 @@ function formatDayMonth(dateStr) {
 }
 
 const EstadoSorteo = ({ sorteo, setSorteo }) => {
-  const { patchData, loading, error } = usePatch(
-    sorteo ? apiRoutes.sorteoById(sorteo.id) : null
-  );
+  const { patchData, loading, error } = usePatch(apiRoutes.sorteos);
   const [estado, setEstado] = useState(false);
   const [mensaje, setMensaje] = useState('');
 
@@ -24,7 +22,11 @@ const EstadoSorteo = ({ sorteo, setSorteo }) => {
 
   const handleGuardar = async () => {
     setMensaje('');
-    const updated = await patchData({ estado_sorteo: estado });
+    if (!sorteo?.id) {
+      setMensaje('❌ No hay sorteo seleccionado');
+      return;
+    }
+    const updated = await patchData(sorteo.id, { estado_sorteo: estado });
     if (updated) {
       setSorteo(prev => ({ ...prev, estado_sorteo: updated.estado_sorteo }));
       setMensaje('✅ Estado actualizado');

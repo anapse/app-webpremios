@@ -1,0 +1,344 @@
+/* Tickets.css - Usando el mismo estilo de la web */
+
+.tickets-page {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+    text-align: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: #1f1f1d;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+.tickets-header h1 {
+    font-family: "Anton", sans-serif;
+    font-size: 2.5rem;
+    color: #ff7e00;
+    letter-spacing: 4px;
+    margin: 0 0 10px 0;
+}
+
+.tickets-header p {
+    color: #e0dfde;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+}
+
+.search-section {
+    background-color: #2a2a2a;
+    border: 1px solid #ff7e00;
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+    color: #ffffff;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 40px;
+}
+
+.search-modes {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.mode-btn {
+    background-color: #1f1f1d;
+    border: 2px solid #ff7e00;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Montserrat", sans-serif;
+}
+
+.mode-btn:hover {
+    background-color: #ff7e00;
+    color: #1f1f1d;
+}
+
+.mode-btn.active {
+    background-color: #ff7e00;
+    color: #1f1f1d;
+}
+
+.search-form {
+    max-width: 100%;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+    background-color: #2c2c2c;
+    color: white;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+    color: #ccc;
+}
+
+.form-group input:focus {
+    outline: 2px solid #ff7e00;
+    background-color: #333;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.btn-search, .btn-reset {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: "Montserrat", sans-serif;
+}
+
+.btn-search {
+    background-color: #ff7e00;
+    color: #1f1f1d;
+}
+
+.btn-search:hover {
+    background-color: #e06f00;
+}
+
+.btn-reset {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #ff7e00;
+}
+
+.btn-reset:hover {
+    background-color: #ff7e00;
+    color: #1f1f1d;
+}
+
+/* Estados de carga y resultados */
+.tickets-loading, .tickets-error, .tickets-empty {
+    background-color: #2a2a2a;
+    border: 1px solid #ff7e00;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    color: #ffffff;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.tickets-loading p {
+    font-size: 1.2rem;
+    color: #ff7e00;
+    margin: 0;
+}
+
+.tickets-error p {
+    color: #ff7e00;
+    margin-bottom: 20px;
+}
+
+.tickets-empty p {
+    color: #e0dfde;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+/* Resultados */
+.tickets-results {
+    background-color: #2a2a2a;
+    border: 1px solid #ff7e00;
+    border-radius: 10px;
+    padding: 30px;
+    color: #ffffff;
+}
+
+.tickets-results h3 {
+    font-family: "Anton", sans-serif;
+    text-align: center;
+    color: #ff7e00;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+}
+
+.tickets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ticket-card {
+    background-color: #1f1f1d;
+    border: 1px solid #ff7e00;
+    border-radius: 6px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 45px;
+}
+
+.ticket-card:hover {
+    border-color: #ff7e00;
+    box-shadow: 0 0 8px rgba(255, 126, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+.ticket-code {
+    color: #ff7e00;
+    font-size: 1rem;
+    font-family: "Anton", sans-serif;
+    letter-spacing: 1px;
+    font-weight: 600;
+    flex: 0 0 140px;
+    text-align: left;
+}
+
+.ticket-name {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    flex: 1;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.ticket-date {
+    color: #e0dfde;
+    font-size: 0.85rem;
+    font-family: "Montserrat", sans-serif;
+    flex: 0 0 80px;
+    text-align: right;
+}
+
+.ticket-info strong {
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tickets-page {
+        padding: 20px 10px;
+    }
+
+    .tickets-header h1 {
+        font-size: 2rem;
+        letter-spacing: 2px;
+    }
+
+    .search-section {
+        margin: 0 0 20px 0;
+        padding: 20px;
+    }
+
+    .search-modes {
+        flex-direction: column;
+    }
+
+    .mode-btn {
+        width: 100%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-search, .btn-reset {
+        width: 100%;
+    }
+
+    .tickets-grid {
+        max-width: 100%;
+        margin: 20px 10px 0 10px;
+    }
+
+    .ticket-card {
+        padding: 10px 12px;
+        min-height: 40px;
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+    }
+
+    .ticket-code {
+        font-size: 0.9rem;
+        flex: none;
+        text-align: center;
+    }
+
+    .ticket-name {
+        font-size: 0.9rem;
+        flex: none;
+        text-align: center;
+        padding: 0;
+    }
+
+    .ticket-date {
+        font-size: 0.8rem;
+        flex: none;
+        text-align: center;
+    }
+}
+
+/* Animaciones - usando la misma del main.css */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.tickets-loading p {
+    animation: pulse 2s infinite;
+}
+
+/* Efectos hover consistentes con el resto de la web */
+.ticket-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mode-btn, .btn-search, .btn-reset {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

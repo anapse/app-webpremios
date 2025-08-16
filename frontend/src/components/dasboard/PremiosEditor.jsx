@@ -6,10 +6,14 @@ import apiRoutes from "../../apiRoutes";
 import "../../styles/dashboard.css";
 
 const PremiosEditor = ({ sorteo }) => {
-  console.log("🔄 Cargando premios para el sorteo:", sorteo?.id);
-  const { data, loading, error } = useFetch(
-    sorteo ? `${apiRoutes.premios}?sorteo_id=${sorteo.id}` : null
-  );
+  console.log("🔄 PremiosEditor - Sorteo recibido:", sorteo);
+  
+  const url = sorteo ? `${apiRoutes.premios}?sorteo_id=${sorteo.id}` : null;
+  console.log("🌐 URL construida para premios:", url);
+  
+  const { data, loading, error } = useFetch(url);
+  
+  console.log("📦 Datos recibidos del fetch:", { data, loading, error });
 
   const { postData } = usePost(apiRoutes.premios);
   const { patchData } = usePatch(apiRoutes.premios);
@@ -21,12 +25,17 @@ const PremiosEditor = ({ sorteo }) => {
   const generateTempId = () => Date.now() + Math.random();
 
   useEffect(() => {
+    console.log("🔄 useEffect - Data cambió:", data);
     if (data && Array.isArray(data.premios)) {
+      console.log("✅ Premios encontrados:", data.premios);
       const premiosConId = data.premios.map((p) => ({
         ...p,
         tempId: p.id || generateTempId(),
       }));
       setPremios(premiosConId);
+    } else if (data) {
+      console.log("⚠️ Data no contiene array de premios:", data);
+      setPremios([]);
     }
   }, [data]);
 
@@ -88,16 +97,24 @@ const handleGuardar = async () => {
 
   setMensaje("");
   setGuardando(true);
+  
+  console.log("💾 Iniciando guardado de premios:", premios);
+  
   try {
     const premiosActualizados = await Promise.all(
       premios.map(async (premio) => {
         const { tempId, ...payload } = premio;
+        console.log(`🔄 Procesando premio ${premio.nombre}:`, { id: premio.id, payload });
+        
         if (!premio.id) {
+          console.log("➕ Creando nuevo premio...");
           const res = await postData(payload);
-          // fusionamos datos locales con respuesta
+          console.log("✅ Premio creado:", res);
           return { ...premio, ...res, tempId: premio.tempId };
         } else {
-          await patchData(premio.id, payload);
+          console.log("📝 Actualizando premio existente...");
+          const res = await patchData(premio.id, payload);
+          console.log("✅ Premio actualizado:", res);
           return premio;
         }
       })
@@ -105,21 +122,46 @@ const handleGuardar = async () => {
 
     setPremios(premiosActualizados);
     setMensaje("✅ Premios guardados correctamente");
+    console.log("🎉 Todos los premios guardados exitosamente");
   } catch (err) {
-    setMensaje("❌ Error al guardar premios");
+    console.error("❌ Error al guardar premios:", err);
+    setMensaje(`❌ Error al guardar premios: ${err.message}`);
   }
   setGuardando(false);
 };
 
 
 
-  if (!sorteo) return <p>Cargando sorteo...</p>;
-  if (loading) return <p>Cargando premios...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (!sorteo) return <p>⏳ Esperando datos del sorteo...</p>;
+  if (loading) return <p>🔄 Cargando premios...</p>;
+  if (error) return (
+    <div className="premios-editor-container">
+      <h3>🎁 Editor de Premios</h3>
+      <div className="mensaje error">
+        ❌ Error al cargar premios: {error}
+        <br />
+        <small>URL: {url}</small>
+        <br />
+        <button onClick={() => window.location.reload()}>🔄 Recargar página</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="premios-editor-container">
       <h3>🎁 Editor de Premios</h3>
+      
+      {/* Debug info - remover en producción */}
+      <details style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
+        <summary>🔧 Debug Info</summary>
+        <pre>{JSON.stringify({
+          sorteoId: sorteo?.id,
+          url: url,
+          dataReceived: data,
+          premiosCount: premios.length,
+          apiBaseUrl: apiRoutes.premios
+        }, null, 2)}</pre>
+      </details>
 
       {premios.map((premio, index) => (
         <div key={premio.tempId} className="premio-item">

@@ -1,13 +1,33 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import fs from 'fs';
+import fs from 'fs'
 
 export default defineConfig({
   plugins: [react()],
-  server: {
-
-
-    port: 80,
-    allowedHosts: ['gameztorepremios.com'], // ✅ Agrega tu dominio aquí
+  build: {
+    // Optimizaciones de build
+    minify: 'terser',
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom']
+        }
+      }
+    }
   },
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    https: {
+      key: fs.readFileSync('C:/nginx/ssl/gameztorepremios_com.key'),
+      cert: fs.readFileSync('C:/nginx/ssl/gameztorepremios_com.crt'),
+    },
+    hmr: {
+      protocol: 'wss',
+      host: 'gameztorepremios.com',
+      clientPort: 443
+    }
+  }
 })

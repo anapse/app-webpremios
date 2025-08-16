@@ -40,13 +40,14 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <h1>Panel de Administración</h1>
 
-      <CrearNuevoSorteo 
-        precioDefault={sorteoActual?.ticket_price} 
-        onNuevoSorteoCreado={handleNuevoSorteoCreado} 
-      />
+     
 
       {sorteoActual && (
         <>
+         <CrearNuevoSorteo 
+        precioDefault={sorteoActual?.ticket_price} 
+        onNuevoSorteoCreado={handleNuevoSorteoCreado} 
+      />
           <NombreSorteo sorteo={sorteoActual} setSorteo={setSorteoActual} />
           <PrecioTicket sorteo={sorteoActual} setSorteo={setSorteoActual} />
           <SorteoFecha sorteo={sorteoActual} setSorteo={setSorteoActual} />

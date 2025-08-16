@@ -1,51 +1,103 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from "react";
+import { useLoading } from "../context/LoadingContext"; // opcional: loader global
 
-const useFetch = (url) => {
+/**
+ * useFetch(url, { method, headers, body, timeoutMs, useGlobalLoader })
+ *
+ * - timeoutMs: ms de timeout (default 10000)
+ * - useGlobalLoader: si true, usa el overlay global del LoadingContext
+ */
+export default function useFetch(url, options = {}) {
+    const {
+        method = "GET",
+        headers = { "Content-Type": "application/json" },
+        body,
+        timeoutMs = 10000,
+        useGlobalLoader = false,
+    } = options;
+
+    const { show, hide } = useLoading?.() || { show: () => { }, hide: () => { } };
+
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState("idle"); // idle | loading | success | error
     const [error, setError] = useState(null);
+    const [timestamp, setTimestamp] = useState(null);
+
+    const prevUrlRef = useRef(null);
+    const refetchTrigger = useRef(0); // para forzar refetch
+    const lastControllerRef = useRef(null);
+
+    const refetch = () => {
+        // fuerza un nuevo fetch incluso si la URL es igual
+        refetchTrigger.current++;
+        // reset estados
+        setStatus("loading");
+        setError(null);
+    };
 
     useEffect(() => {
         if (!url) {
-            setLoading(false);
+            setStatus("idle");
+            setData(null);
+            setError(null);
             return;
         }
 
-        setLoading(true);
-        setError(null);
+        // si URL es igual y no forzamos, no re-fetch
+        if (prevUrlRef.current === url && status === "success") {
+            return;
+        }
+        prevUrlRef.current = url;
 
         const controller = new AbortController();
+        lastControllerRef.current = controller;
 
-        fetch(url, {
-            signal: controller.signal,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            // Timeout de 10 segundos
-        })
-            .then((res) => {
+        const timer = setTimeout(() => controller.abort(new Error("timeout")), timeoutMs);
+
+        async function run() {
+            try {
+                setStatus("loading");
+                setError(null);
+                if (useGlobalLoader) show("Cargando...");
+
+                const res = await fetch(url, {
+                    method,
+                    headers,
+                    body,
+                    signal: controller.signal,
+                });
 
                 if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    const text = await res.text().catch(() => "");
+                    throw new Error(`HTTP ${res.status}: ${res.statusText} ${text || ""}`.trim());
                 }
-                return res.json();
-            })
-            .then((data) => {
 
-                setData(data);
-            })
-            .catch((err) => {
-                if (err.name !== 'AbortError') {
-                    console.error('❌ VPS Fetch error:', err.message, 'for', url);
-                    setError(`Error conectando al servidor: ${err.message}`);
+                const json = await res.json();
+                setData(json);
+                setTimestamp(Date.now());
+                setStatus("success");
+            } catch (e) {
+                if (e?.name === "AbortError") {
+                    // abort normal o timeout -> si necesitas diferenciar, mira e.message
+                    return;
                 }
-            })
-            .finally(() => setLoading(false));
+                console.error("❌ Fetch error:", e?.message || e, "→", url);
+                setError(e?.message || "Error de red");
+                setStatus("error");
+            } finally {
+                clearTimeout(timer);
+                if (useGlobalLoader) hide();
+            }
+        }
 
-        return () => controller.abort();
-    }, [url]);
+        run();
 
-    return { data, loading, error };
-};
+        return () => {
+            clearTimeout(timer);
+            controller.abort();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [url, refetchTrigger.current]); // NO metas 'options' si cambian en cada render
 
-export default useFetch;
+    return { data, error, status, loading: status === "loading", timestamp, refetch };
+}

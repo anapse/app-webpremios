@@ -1,0 +1,65 @@
+/* Bloquea scroll cuando el overlay está activo (opcional) */
+body.loading { overflow: hidden; }
+
+/* Overlay base */
+.loading-overlay{
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(31,31,29,0.75);
+  backdrop-filter: blur(2px);
+  display: grid; 
+  place-items: center;         /* centra x/y */
+  z-index: 2147483647;         /* por encima de todo */
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.98);
+  transition-property: opacity, transform, visibility;
+  transition-duration: 350ms;  /* 🔥 agrega duración del fade */
+  transition-timing-function: ease-out;
+  will-change: opacity, transform;
+}
+
+/* Estados de visibilidad con transición */
+.loading-overlay.is-visible{
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: all;     /* bloquea interacción debajo */
+}
+.loading-overlay.is-hidden{
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+/* Contenido */
+.loading-content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Logo girando (tamaños + contraste) */
+.spinner-img{
+  display: block;
+  width: 84px;                 /* 🔥 más grande en móvil */
+  height: 84px;
+  animation: spin 1.6s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(255,126,0,.5)) brightness(1.05); /* resalta el logo */
+}
+
+.spinner-text{
+  margin-top: 12px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ff7e00;
+}
+
+/* Desktop: aún más grande */
+@media (min-width: 768px){
+  .spinner-img{ width: 120px; height: 120px; }  /* 🔥 tamaño desktop */
+  .spinner-text{ font-size: 1.15rem; }
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }

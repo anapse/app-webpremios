@@ -9,3 +9,6 @@ dist/
 # Ignorar carpetas específicas
 backend/node_modules/
 frontend/node_modules/
+# Ignorar archivo .env del backend
+backend/.env
+frontend/.env

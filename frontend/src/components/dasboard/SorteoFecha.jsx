@@ -4,9 +4,7 @@ import apiRoutes from '../../apiRoutes';
 
 const SorteoFecha = ({ sorteo, setSorteo }) => {
   const [fecha, setFecha] = useState(sorteo?.sorteo_date?.split('T')[0] || '');
-  const { patchData, loading, error } = usePatch(
-    sorteo ? apiRoutes.sorteoById(sorteo.id) : null
-  );
+  const { patchData, loading, error } = usePatch(apiRoutes.sorteos);
   const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
@@ -15,7 +13,11 @@ const SorteoFecha = ({ sorteo, setSorteo }) => {
 
   const handleGuardar = async () => {
     setMensaje('');
-    const result = await patchData({ sorteo_date: new Date(fecha).toISOString() });
+    if (!sorteo?.id) {
+      setMensaje('❌ No hay sorteo seleccionado');
+      return;
+    }
+    const result = await patchData(sorteo.id, { sorteo_date: new Date(fecha).toISOString() });
     if (result) {
       setSorteo(prev => ({ ...prev, sorteo_date: new Date(fecha).toISOString() }));
       setMensaje('✅ Fecha actualizada');

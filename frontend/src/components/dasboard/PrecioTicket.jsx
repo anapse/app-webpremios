@@ -4,9 +4,7 @@ import apiRoutes from '../../apiRoutes';
 import '../../styles/dashboard.css';
 
 const PrecioTicket = ({ sorteo, setSorteo }) => {
-  const { patchData, loading, error } = usePatch(
-    sorteo ? apiRoutes.sorteoById(sorteo.id) : null
-  );
+  const { patchData, loading, error } = usePatch(apiRoutes.sorteos);
   const [precio, setPrecio] = useState('');
   const [mensaje, setMensaje] = useState('');
 
@@ -18,7 +16,11 @@ const PrecioTicket = ({ sorteo, setSorteo }) => {
 
   const handleGuardar = async () => {
     setMensaje('');
-    const updated = await patchData({ ticket_price: Number(precio) });
+    if (!sorteo?.id) {
+      setMensaje('❌ No hay sorteo seleccionado');
+      return;
+    }
+    const updated = await patchData(sorteo.id, { ticket_price: Number(precio) });
     if (updated) {
       setSorteo(prev => ({ ...prev, ticket_price: updated.ticket_price }));
       setMensaje('✅ Precio actualizado');

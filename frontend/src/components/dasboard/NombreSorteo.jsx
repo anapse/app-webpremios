@@ -5,9 +5,7 @@ import '../../styles/dashboard.css';
 
 const NombreSorteo = ({ sorteo, setSorteo }) => {
  
-  const { patchData, loading, error } = usePatch(
-    sorteo ? apiRoutes.sorteoById(sorteo.id) : null
-  );
+  const { patchData, loading, error } = usePatch(apiRoutes.sorteos);
 
   const [nombre, setNombre] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -23,7 +21,11 @@ const NombreSorteo = ({ sorteo, setSorteo }) => {
       setMensaje('❌ El nombre no puede estar vacío');
       return;
     }
-    const updated = await patchData({ nombre_sorteo: nombre.trim() });
+    if (!sorteo?.id) {
+      setMensaje('❌ No hay sorteo seleccionado');
+      return;
+    }
+    const updated = await patchData(sorteo.id, { nombre_sorteo: nombre.trim() });
     if (updated) {
       setSorteo(prev => ({ ...prev, nombre_sorteo: updated.nombre_sorteo }));
       setMensaje('✅ Nombre actualizado');

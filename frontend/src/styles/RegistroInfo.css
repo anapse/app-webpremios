@@ -1,71 +1,102 @@
 .registro-info {
   min-height: calc(100vh - 70px);
-  height: auto;
-  flex: 1;
+  padding: 20px 15px;
   background-color: #1f1f1d;
   color: #ffffff;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
-  margin: 0;
+  gap: 20px;
 }
 
 .registro-info h2 {
   font-family: "Anton", sans-serif;
   color: #ff7e00;
-  font-size: 2.5rem;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
 }
 
-.paso {
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.2rem;
-}
-.detalle {
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.2rem;
-}
-.costo {
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.2rem;
-  margin-bottom: -10px;
-}
-
+.paso,
+.detalle,
+.costo,
 .paso2 {
   font-family: "Montserrat", sans-serif;
-  font-size: 1.2rem;
-  margin: 15px;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 10px;
 }
+
+.paso strong {
+  color: #ff7e00;
+}
+
+.detalle p {
+  margin: 4px 0;
+}
+
+.detalle ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
 .numero {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #ff7e00;
-  margin: 0;
 }
+
 .precio {
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: bold;
   color: #f97e00;
-
   margin: 0;
 }
+
 .flecha {
-  font-size: 5rem;
+  font-size: 4rem;
   color: #ff7e00;
-  margin: 0;
-
   animation: bounce 1.5s infinite;
-}
-.qr-container {
-  text-align: center;
+  margin-top: 15px;
 }
 
 .qr-image {
   max-width: 200px;
   width: 100%;
   height: auto;
+  margin: 10px 0;
 }
+
+/* 📱 Ajustes móviles */
+@media (max-width: 480px) {
+  .registro-info {
+    padding: 20px 10px;
+  }
+
+  .registro-info h2 {
+    font-size: 1.8rem;
+  }
+
+  .paso,
+  .detalle,
+  .costo,
+  .paso2 {
+    font-size: 1rem;
+  }
+
+  .precio {
+    font-size: 2.5rem;
+  }
+
+  .flecha {
+    font-size: 3.5rem;
+  }
+}
+
 @keyframes bounce {
   0%,
   100% {

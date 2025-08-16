@@ -1,0 +1,147 @@
+/* ===== Libro de Reclamaciones (tema oscuro + acento naranja) ===== */
+
+/* contenedor general de la sección (alineado con .main centrado) */
+.lr-container {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* tarjetas (coherentes con .card de main.css) */
+.lr-card {
+  background-color: #2a2a2a;
+  border: 1px solid #ff7e00;
+  padding: 20px;
+  border-radius: 10px;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* bloque legal */
+.lr-legal {
+  color: #e0dfde;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* título dentro del formulario */
+.lr-title {
+  font-family: "Anton", sans-serif;
+  font-size: 1.4rem;
+  color: #ff7e00;
+  margin: 0 0 12px 0;
+}
+
+/* grilla del formulario */
+.lr-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.lr-col-span-2 {
+  grid-column: 1 / -1;
+}
+
+/* campos */
+.lr-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+
+.lr-form input,
+.lr-form select,
+.lr-form textarea {
+  padding: 10px;
+  border: 1px solid #ff7e00;
+  border-radius: 6px;
+  background-color: #1f1f1d;
+  color: #ffffff;
+  font-size: 0.92rem;
+}
+
+.lr-form input:focus,
+.lr-form select:focus,
+.lr-form textarea:focus {
+  outline: none;
+  border-color: #ffa54d;
+  box-shadow: 0 0 6px rgba(255, 126, 0, 0.45);
+}
+
+/* checks */
+.lr-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+}
+
+/* acciones */
+.lr-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* botones (coherentes con .buy-btn pero en pequeño) */
+.lr-btn {
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  border: none;
+}
+
+.lr-btn.primary {
+  background-color: #ff7e00;
+  color: #1f1f1d;
+}
+
+.lr-btn.primary:hover {
+  background-color: #e06f00;
+}
+
+.lr-btn.secondary {
+  background-color: transparent;
+  border: 1px solid #ff7e00;
+  color: #ff7e00;
+}
+
+.lr-btn.secondary:hover {
+  background-color: #ff7e00;
+  color: #1f1f1d;
+}
+
+/* alertas */
+.lr-alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.lr-alert.error {
+  background-color: #7a0f0f;
+  color: #ffffff;
+}
+
+.lr-alert.success {
+  background-color: #0f7a2d;
+  color: #ffffff;
+}
+
+/* nota final */
+.lr-footnote {
+  margin-top: 10px;
+  color: #e0dfde;
+  font-size: 0.9rem;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .lr-grid-2 { grid-template-columns: 1fr; }
+}

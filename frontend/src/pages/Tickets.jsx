@@ -40,9 +40,11 @@ export default function Tickets() {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: '2-digit'
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         });
     };
 
@@ -90,9 +92,22 @@ export default function Tickets() {
                 <div className="tickets-results">
                     <h3>🎟️ Ticket encontrado</h3>
                     <div className="ticket-card">
-                        <span className="ticket-code">{ticket.codigo_ticket}</span>
-                        <span className="ticket-name">{ticket.nombres}</span>
-                        <span className="ticket-date">{formatDate(ticket.fecha)}</span>
+                        <div className="ticket-header">
+                            <h4>{ticket.codigo_ticket}</h4>
+                            <span 
+                                className="estado-badge"
+                                style={{ backgroundColor: getEstadoPagoColor(ticket.estado_pago) }}
+                            >
+                                {ticket.estado_pago}
+                            </span>
+                        </div>
+                        <div className="ticket-info">
+                            <p><strong>Nombre:</strong> {ticket.nombres}</p>
+                            <p><strong>DNI/CE:</strong> {ticket.dni}</p>
+                            <p><strong>Teléfono:</strong> {ticket.telefono}</p>
+                            <p><strong>Departamento:</strong> {ticket.departamento}</p>
+                            <p><strong>Fecha:</strong> {formatDate(ticket.fecha)}</p>
+                        </div>
                     </div>
                 </div>
             );
@@ -117,9 +132,20 @@ export default function Tickets() {
                     <div className="tickets-grid">
                         {ticketsData.map((ticket) => (
                             <div key={ticket.id} className="ticket-card">
-                                <span className="ticket-code">{ticket.codigo_ticket}</span>
-                                <span className="ticket-name">{ticket.nombres}</span>
-                                <span className="ticket-date">{formatDate(ticket.fecha)}</span>
+                                <div className="ticket-header">
+                                    <h4>{ticket.codigo_ticket}</h4>
+                                    <span 
+                                        className="estado-badge"
+                                        style={{ backgroundColor: getEstadoPagoColor(ticket.estado_pago) }}
+                                    >
+                                        {ticket.estado_pago}
+                                    </span>
+                                </div>
+                                <div className="ticket-info">
+                                    <p><strong>Sorteo:</strong> {ticket.nombre_sorteo || `Sorteo #${ticket.sorteo_id}`}</p>
+                                    <p><strong>Fecha:</strong> {formatDate(ticket.fecha)}</p>
+                                    <p><strong>Estado:</strong> {ticket.estado_pago}</p>
+                                </div>
                             </div>
                         ))}
                     </div>

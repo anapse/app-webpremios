@@ -8,23 +8,26 @@
 /* Fila superior */
 .footer-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 /* Botones */
 .footer-cta {
   background-color: #ff7e00;
   color: #1f1f1d;
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 20px;
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
   border: 2px solid #ff7e00;
   transition: background-color 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
 }
 .footer-cta:hover {
   background-color: #e06f00;
@@ -64,5 +67,44 @@
     flex-direction: row;
     justify-content: center;
     gap: 16px;
+  }
+  
+  .footer-top {
+    justify-content: space-between;
+    gap: 20px;
+  }
+}
+
+/* Responsive para pantallas pequeñas (móvil) */
+@media (max-width: 767px) {
+  .footer {
+    padding: 20px 15px;
+  }
+  
+  .footer-top {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+  
+  .footer-cta {
+    width: 100%;
+    max-width: 280px;
+    padding: 10px 20px;
+    text-align: center;
+  }
+  
+  .footer-bottom {
+    gap: 15px;
+  }
+  
+  .footer-social {
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .footer-social img {
+    width: 28px;
+    height: 28px;
   }
 }

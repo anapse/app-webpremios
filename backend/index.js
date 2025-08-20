@@ -13,9 +13,12 @@ const corsOptions = {
         'http://77.237.239.180:80',
         'http://77.237.239.180:3000',
         'http://localhost:5173',
+        'https://localhost:5173',
         'http://localhost:3000',
         'http://gameztorepremios.com',   // <-- agrega aquí
-        'https://gameztorepremios.com'   // <-- y HTTPS si usas
+        'https://gameztorepremios.com',   // <-- y HTTPS si usas
+        'https://gameztorepremios.com:5173'
+
     ],
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -36,6 +39,7 @@ app.use('/api/ganadores', require('./routes/ganadores.routes'));
 app.use('/api/sorteos', require('./routes/sorteos.routes'));
 app.use('/api/premios', require('./routes/premios.routes'));
 app.use('/api/libro-reclamaciones', require('./routes/libroReclamaciones.routes'));
+app.use('/api/niubiz', require('./routes/niubiz.routes'));  // <-- monta Niubiz aquí
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -17,19 +17,20 @@ const RegistroInfo = () => {
    <section className="registro-info">
   <h2>¿Cómo Participar?</h2>
 
-  <p className="paso">📝 <strong>PASO 1:</strong> Completa tus datos en el formulario de abajo.</p>
+  <p className="paso">📝 <strong>PASO 1:</strong> Completa tus datos en el formulario de abajo (DNI o Carnet de Extranjería).</p>
 
-  <p className="paso">💳 <strong>PASO 2:</strong> Haz clic en <strong>Pagar con Yape</strong> y sigue las instrucciones del sistema seguro de pago.</p>
+  <p className="paso">💳 <strong>PASO 2:</strong> Haz clic en <strong>Registrar Ticket</strong> para iniciar el proceso de pago seguro con Niubiz.</p>
 
   <p className="detalle">
-    🔐 Ingresa tu <strong>código de aprobación Yape</strong> generado desde la app.
+    � Se generará un <strong>código QR de Yape</strong> que debes escanear con tu app Yape para completar el pago.
   </p>
 
-  <p className="paso">🎫 <strong>PASO 3:</strong> Tu ticket se generará automáticamente.</p>
+  <p className="paso">🎫 <strong>PASO 3:</strong> Una vez confirmado el pago, tu ticket se generará automáticamente.</p>
 
   <div className="detalle">
-    <p>✅ Verás tu <strong>código de ticket</strong> en pantalla.</p>
-    <p>📄 Podrás <strong>descargarlo como PDF</strong>.</p>
+    <p>✅ Verás tu <strong>código de ticket único</strong> en pantalla.</p>
+    <p>📄 Podrás <strong>descargarlo como PDF</strong> para conservarlo.</p>
+    <p>🔍 También podrás <strong>buscar tus tickets</strong> en la sección "Mis Tickets".</p>
   </div>
 
   <p className="costo">🎟️ Costo del ticket</p>

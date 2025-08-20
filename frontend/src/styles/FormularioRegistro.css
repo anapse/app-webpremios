@@ -81,3 +81,329 @@ button:hover {
   font-size: 0.9rem;
   color: #ccc;
 }
+
+/* === Estilos para la vista de pago === */
+.pago-yape {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1d 100%);
+  border-radius: 15px;
+  margin: 1rem 0;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  border: 2px solid #ff7e00;
+}
+
+.pago-yape p {
+  margin: 0.5rem 0;
+  color: #ffffff;
+}
+
+.pago-yape p:first-child {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #ff7e00;
+}
+
+/* Contenedor del QR mock */
+.qr-mock-container {
+  width: 280px;
+  height: 280px;
+  border: 3px solid #ff7e00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  border-radius: 15px;
+  background: linear-gradient(45deg, #e0dfde 0%, #ffffff 100%);
+  position: relative;
+  box-shadow: 
+    0 4px 15px rgba(255, 126, 0, 0.3),
+    inset 0 2px 4px rgba(255,255,255,0.5);
+  transition: all 0.3s ease;
+}
+
+.qr-mock-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(255, 126, 0, 0.4),
+    inset 0 2px 4px rgba(255,255,255,0.5);
+}
+
+.qr-mock-content {
+  text-align: center;
+  color: #1f1f1d;
+}
+
+.qr-mock-content .icon {
+  font-size: 64px;
+  margin-bottom: 15px;
+  background: linear-gradient(45deg, #ff7e00, #e06f00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.qr-mock-content .title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1f1f1d;
+  font-family: "Anton", sans-serif;
+}
+
+.qr-mock-content .subtitle {
+  font-size: 14px;
+  color: #2a2a2a;
+  font-weight: 500;
+}
+
+/* Badge de modo de prueba */
+.test-mode-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #ff7e00;
+  color: #1f1f1d;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255, 126, 0, 0.4);
+  border: 2px solid #ffffff;
+  font-family: "Anton", sans-serif;
+}
+
+/* Mensaje de estado del pago */
+.payment-status {
+  background: rgba(42, 42, 42, 0.8);
+  border: 1px solid rgba(255, 126, 0, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.payment-status p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #e0dfde;
+}
+
+.payment-status .timer {
+  font-weight: bold;
+  color: #ff7e00;
+  font-size: 16px;
+}
+
+/* Animación de pulso para el QR */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.qr-mock-container.processing {
+  animation: pulse 2s infinite;
+  border-color: #ff7e00;
+  box-shadow: 
+    0 4px 15px rgba(255, 126, 0, 0.5),
+    0 0 20px rgba(255, 126, 0, 0.3);
+}
+
+/* Spinner de carga */
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(224, 223, 222, 0.3);
+  border-top: 3px solid #ff7e00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para el resultado del ticket */
+.resultado-ticket {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1d 100%);
+  border-radius: 15px;
+  margin: 1rem 0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  border: 2px solid #ff7e00;
+}
+
+.resultado-ticket p {
+  margin: 0.5rem 0;
+  color: #ffffff;
+}
+
+.resultado-ticket h3 {
+  font-size: 2rem;
+  margin: 1rem 0;
+  color: #ff7e00;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: 2px;
+  font-family: "Anton", sans-serif;
+}
+
+.resultado-ticket button {
+  background: #ff7e00;
+  color: #1f1f1d;
+  border: 2px solid #ff7e00;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: bold;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  font-family: "Montserrat", sans-serif;
+}
+
+.resultado-ticket button:hover {
+  background: #e06f00;
+  color: #1f1f1d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 126, 0, 0.4);
+}
+
+/* Error styling */
+.error {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #dc3545;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* === Estilos para el nuevo flujo de Niubiz === */
+.pago-niubiz {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1d 100%);
+  border-radius: 15px;
+  margin: 1rem 0;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  border: 2px solid #0066cc;
+}
+
+.pago-niubiz p {
+  margin: 0.5rem 0;
+  color: #ffffff;
+}
+
+.pago-niubiz p:first-child {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #0066cc;
+}
+
+/* Contenedor para Niubiz mock */
+.niubiz-mock-container {
+  width: 280px;
+  height: 280px;
+  border: 3px solid #0066cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  border-radius: 15px;
+  background: linear-gradient(45deg, #e0dfde 0%, #ffffff 100%);
+  position: relative;
+  box-shadow: 
+    0 4px 15px rgba(0, 102, 204, 0.3),
+    inset 0 2px 4px rgba(255,255,255,0.5);
+  transition: all 0.3s ease;
+}
+
+.niubiz-mock-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 102, 204, 0.4),
+    inset 0 2px 4px rgba(255,255,255,0.5);
+}
+
+.niubiz-mock-content {
+  text-align: center;
+  color: #1f1f1d;
+}
+
+.niubiz-mock-content .icon {
+  font-size: 64px;
+  margin-bottom: 15px;
+  background: linear-gradient(45deg, #0066cc, #004499);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.niubiz-mock-content .title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #1f1f1d;
+}
+
+.niubiz-mock-content .subtitle {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Estado de procesamiento de Niubiz */
+.niubiz-processing {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #004499 0%, #0066cc 100%);
+  border-radius: 15px;
+  margin: 1rem 0;
+  color: white;
+}
+
+.niubiz-processing p:first-child {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+/* Responsivo para Niubiz */
+@media (max-width: 768px) {
+  .niubiz-mock-container {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .niubiz-mock-content .icon {
+    font-size: 48px;
+  }
+  
+  .pago-niubiz, .niubiz-processing {
+    padding: 1.5rem;
+  }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .qr-mock-container {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .qr-mock-content .icon {
+    font-size: 48px;
+  }
+  
+  .pago-yape {
+    padding: 1.5rem;
+  }
+}

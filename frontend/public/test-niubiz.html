@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Niubiz - Botón de Pago Web</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .payment-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Niubiz - Botón de Pago Web (Implementación Correcta)</h1>
+        
+        <div class="payment-section">
+            <h2>📝 Información del Ticket</h2>
+            <p><strong>Precio:</strong> S/ 15.00</p>
+            <p><strong>Descripción:</strong> Ticket Game Ztore</p>
+            
+            <button onclick="iniciarPagoNiubiz()">💳 Pagar con Niubiz (incluye Yape)</button>
+        </div>
+
+        <div id="niubiz-checkout-container" style="display: none;">
+            <h3>🔐 Checkout de Niubiz</h3>
+            <div id="niubiz-form"></div>
+        </div>
+
+        <div class="log">
+            <h3>📊 Logs:</h3>
+            <div id="logs"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+        }
+
+        async function iniciarPagoNiubiz() {
+            try {
+                log('🚀 Iniciando proceso de pago...');
+                
+                // Paso 1: Crear sesión de pago
+                const sessionResponse = await fetch('/api/niubiz/session/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 15,
+                        customer: {
+                            dni: '12345678',
+                            email: 'test@gameztore.com',
+                            telefono: '987654321'
+                        }
+                    })
+                });
+
+                const sessionData = await sessionResponse.json();
+                log(`✅ Sesión creada: ${JSON.stringify(sessionData)}`);
+
+                if (sessionData.testMode) {
+                    log('⚠️ Modo de prueba detectado. Simulando pago...');
+                    simularPago();
+                    return;
+                }
+
+                // Paso 2: Cargar librería de Niubiz
+                await cargarLibreriaNiubiz(sessionData.checkoutUrl);
+
+                // Paso 3: Configurar el botón de pago
+                configurarBotonPago(sessionData);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`);
+            }
+        }
+
+        function cargarLibreriaNiubiz(checkoutUrl) {
+            return new Promise((resolve, reject) => {
+                if (window.VisanetCheckout) {
+                    resolve();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = checkoutUrl;
+                script.onload = () => {
+                    log('✅ Librería de Niubiz cargada');
+                    resolve();
+                };
+                script.onerror = () => {
+                    reject(new Error('No se pudo cargar la librería de Niubiz'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        function configurarBotonPago(sessionData) {
+            const purchaseNumber = Date.now().toString().slice(-10);
+            
+            // Configuración según documentación oficial
+            VisanetCheckout.configure({
+                sessionkey: sessionData.sessionKey,
+                merchantid: sessionData.merchantId,
+                purchasenumber: purchaseNumber,
+                amount: sessionData.amount,
+                expirationminutes: 15,
+                
+                // Callbacks según documentación
+                success: function(response) {
+                    log(`✅ Pago exitoso: ${JSON.stringify(response)}`);
+                    autorizarTransaccion(response.transactionToken, purchaseNumber, sessionData.amount);
+                },
+                
+                error: function(error) {
+                    log(`❌ Error en el pago: ${JSON.stringify(error)}`);
+                },
+                
+                close: function() {
+                    log('ℹ️ Checkout cerrado por el usuario');
+                }
+            });
+
+            // Mostrar el formulario
+            document.getElementById('niubiz-checkout-container').style.display = 'block';
+            VisanetCheckout.open();
+        }
+
+        async function autorizarTransaccion(transactionToken, purchaseNumber, amount) {
+            try {
+                log('🔐 Autorizando transacción...');
+                
+                const authResponse = await fetch('/api/niubiz/authorize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        transactionToken,
+                        purchaseNumber,
+                        amount
+                    })
+                });
+
+                const authData = await authResponse.json();
+                log(`✅ Autorización completada: ${JSON.stringify(authData)}`);
+
+                if (authData.dataMap?.ACTION_CODE === '000') {
+                    log('🎉 ¡Pago aprobado! Redirigiendo...');
+                    // Aquí iría la lógica para crear el ticket
+                } else {
+                    log('❌ Pago rechazado');
+                }
+                
+            } catch (error) {
+                log(`❌ Error en autorización: ${error.message}`);
+            }
+        }
+
+        function simularPago() {
+            log('🎭 Simulando pago exitoso en 3 segundos...');
+            setTimeout(() => {
+                log('✅ Pago simulado completado');
+                log('🎉 Ticket creado exitosamente (modo prueba)');
+            }, 3000);
+        }
+
+        // Cargar al inicio de la página
+        window.onload = function() {
+            log('📱 Página cargada. Listo para procesar pagos.');
+        };
+    </script>
+</body>
+</html>

@@ -20,6 +20,9 @@ const apiRoutes = {
     ticketsByDni: (dni) => `${API_BASE_URL}/tickets/dni/${encodeURIComponent(dni)}`,
     ticketByCode: (codigo) => `${API_BASE_URL}/tickets/codigo/${encodeURIComponent(codigo)}`,
 
+    // Pagos
+    niubizPayment: `${API_BASE_URL}/niubiz/payment`,
+
     // Otros
     libroReclamaciones: `${API_BASE_URL}/libro-reclamaciones`,
 };

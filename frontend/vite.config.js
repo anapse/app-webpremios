@@ -28,6 +28,16 @@ export default defineConfig({
       protocol: 'wss',
       host: 'gameztorepremios.com',
       clientPort: 443
+    },
+    // Proxy de desarrollo para evitar CORS cuando se llama a /api desde Vite
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        // opcional: reescritura si sirves backend bajo otro prefijo
+        // rewrite: (path) => path.replace(/^\/api/, '/api'),
+      }
     }
   }
 })

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../styles/Navbar.css';
 import logo from '../assets/logo128.png';
@@ -11,15 +11,49 @@ function Navbar() {
   const [loginForm, setLoginForm] = useState({ usuario: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Verificar si hay sesión activa al cargar
+  // Verificar si hay sesión activa al cargar y escuchar cambios en localStorage
   useEffect(() => {
-    const savedUser = localStorage.getItem('dashboardUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsLoggedIn(true);
-    }
-  }, []);
+    const checkAuthStatus = () => {
+      const savedUser = localStorage.getItem('dashboardUser');
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          setUser(userData);
+          setIsLoggedIn(true);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('dashboardUser');
+          setUser(null);
+          setIsLoggedIn(false);
+        }
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+      }
+    };
+
+    // Verificar al cargar
+    checkAuthStatus();
+
+    // Escuchar cambios en localStorage (cuando se cierra sesión en otra pestaña)
+    const handleStorageChange = (e) => {
+      if (e.key === 'dashboardUser') {
+        checkAuthStatus();
+        // Si se eliminó la sesión, redirigir a home si estamos en dashboard
+        if (!e.newValue && window.location.hash.includes('/dashboard')) {
+          navigate('/', { replace: true });
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [navigate]);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const handleLinkClick = () => setMenuOpen(false);
@@ -79,6 +113,11 @@ function Navbar() {
     setUser(null);
     localStorage.removeItem('dashboardUser');
     console.log('👋 Sesión cerrada');
+    
+    // Si estamos en dashboard, redirigir a home
+    if (window.location.hash.includes('/dashboard')) {
+      navigate('/', { replace: true });
+    }
   };
 
   return (

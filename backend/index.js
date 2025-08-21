@@ -26,7 +26,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+
+// Aumentar límites para archivos grandes (imágenes)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 // Middleware para logs
 
@@ -38,8 +42,10 @@ app.use('/api/tickets', require('./routes/ticketRoutes'));
 app.use('/api/ganadores', require('./routes/ganadores.routes'));
 app.use('/api/sorteos', require('./routes/sorteos.routes'));
 app.use('/api/premios', require('./routes/premios.routes'));
+app.use('/api/home-banner', require('./routes/homeBanner.routes'));
 app.use('/api/libro-reclamaciones', require('./routes/libroReclamaciones.routes'));
 app.use('/api/niubiz', require('./routes/niubiz.routes'));  // <-- monta Niubiz aquí
+app.use('/api/config', require('./routes/config.routes'));  // <-- configuración del sistema
 
 // Health check
 app.get('/api/health', (req, res) => {

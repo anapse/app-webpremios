@@ -10,6 +10,7 @@ const apiRoutes = {
     // Ganadores
     ganadores: `${API_BASE_URL}/ganadores`,
     premios: `${API_BASE_URL}/premios`,
+    homeBanner: `${API_BASE_URL}/home-banner`,
     // Usuarios
     users: `${API_BASE_URL}/users`,
     userLogin: `${API_BASE_URL}/users/login`,

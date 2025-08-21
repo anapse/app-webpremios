@@ -1,0 +1,54 @@
+# =======================================================
+# URLs DE EJEMPLO PARA BANNERS - LISTAS PARA USAR
+# =======================================================
+
+# 🎮 BANNERS DE SORTEOS/GAMING:
+https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&h=400&fit=crop&crop=center
+https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&h=400&fit=crop&crop=center
+https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1200&h=400&fit=crop&crop=center
+
+# 🏆 BANNERS DE PREMIOS:
+https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=400&fit=crop&crop=center
+https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=1200&h=400&fit=crop&crop=center
+
+# 🎉 BANNERS DE CELEBRACIÓN:
+https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&h=400&fit=crop&crop=center
+https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&h=400&fit=crop&crop=center
+
+# 🚗 BANNERS DE AUTOS (para Toyota Yaris):
+https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=1200&h=400&fit=crop&crop=center
+https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1200&h=400&fit=crop&crop=center
+
+# 📱 BANNERS DE TECNOLOGÍA:
+https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=400&fit=crop&crop=center
+https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=1200&h=400&fit=crop&crop=center
+
+# =======================================================
+# INSTRUCCIONES DE USO:
+# =======================================================
+
+# 1. Copia cualquiera de estas URLs
+# 2. Pégala en el campo "URL de Imagen del Banner"
+# 3. Agrega tu título y descripción
+# 4. Guarda el banner
+
+# Todas estas imágenes son:
+# - Tamaño optimizado: 1200x400px
+# - Calidad web (rápida carga)
+# - Libres de uso (Unsplash)
+# - Responsivas
+
+# =======================================================
+# PARA CREAR TUS PROPIAS URLs:
+# =======================================================
+
+# Unsplash (recomendado):
+# https://images.unsplash.com/photo-[ID]?w=1200&h=400&fit=crop&crop=center
+
+# Imgur:
+# Sube imagen a imgur.com y usa el enlace directo
+
+# Otros servicios:
+# - Cloudinary
+# - Picsum (imágenes de prueba)
+# - Tu propio servidor/hosting

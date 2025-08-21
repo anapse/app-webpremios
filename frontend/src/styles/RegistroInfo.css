@@ -1,6 +1,6 @@
 .registro-info {
   min-height: calc(100vh - 70px);
-  padding: 20px 15px;
+  padding: 40px 20px;
   background-color: #1f1f1d;
   color: #ffffff;
   display: flex;
@@ -8,53 +8,104 @@
   justify-content: flex-start;
   align-items: center;
   text-align: center;
-  gap: 20px;
+}
+
+.info-container {
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .registro-info h2 {
   font-family: "Anton", sans-serif;
   color: #ff7e00;
-  font-size: 2.2rem;
-  margin-bottom: 10px;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.paso-container {
+  background: rgba(255, 126, 0, 0.1);
+  border: 2px solid #ff7e00;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 15px 0;
 }
 
 .paso,
-.detalle,
-.costo,
 .paso2 {
   font-family: "Montserrat", sans-serif;
-  font-size: 1.1rem;
-  line-height: 1.4;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 10px;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  font-weight: 600;
 }
 
-.paso strong {
-  color: #ff7e00;
-}
-
-.detalle p {
-  margin: 4px 0;
-}
-
-.detalle ul {
-  list-style: none;
-  padding: 0;
-  margin: 8px 0;
+.numero-container {
+  background: linear-gradient(135deg, #ff7e00, #f97e00);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(255, 126, 0, 0.3);
 }
 
 .numero {
-  font-size: 1.6rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: #ff7e00;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+}
+
+.qr-image {
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  border: 3px solid #ff7e00;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.qr-image:hover {
+  transform: scale(1.05);
+}
+
+.precio-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.costo {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #cccccc;
 }
 
 .precio {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: bold;
-  color: #f97e00;
+  color: #ff7e00;
   margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.paso2-destacado {
+  color: #ff7e00;
+  font-weight: bold;
+  font-size: 1.1em;
 }
 
 .flecha {
@@ -62,13 +113,7 @@
   color: #ff7e00;
   animation: bounce 1.5s infinite;
   margin-top: 15px;
-}
-
-.qr-image {
-  max-width: 200px;
-  width: 100%;
-  height: auto;
-  margin: 10px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* 📱 Ajustes móviles */

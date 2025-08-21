@@ -98,9 +98,9 @@ exports.createTicket = async (req, res) => {
         `);
 
         await tx.commit();
-        
+
         console.log(`✅ Ticket creado: ${codigo_ticket} - Estado: ${estado_pago}`);
-        
+
         return res.status(201).json({
             message: '🎫 Ticket registrado exitosamente',
             codigo_ticket,
@@ -224,7 +224,7 @@ exports.activateTicket = async (req, res) => {
         }
 
         const pool = getConnection();
-        
+
         // Verificar que el ticket existe y está pendiente
         const checkResult = await pool.request()
             .input('id', sql.Int, parseInt(id))
@@ -252,7 +252,7 @@ exports.activateTicket = async (req, res) => {
             `);
 
         const updatedTicket = updateResult.recordset[0];
-        
+
         console.log(`✅ Ticket ${updatedTicket.codigo_ticket} activado: ${ticket.estado_pago} → ${estado_pago}`);
 
         res.json({

@@ -104,13 +104,70 @@ h2 {
 
 
 
+/* Banner del sorteo */
 .sorteo-banner {
   width: 100%;
-  max-width: 800px; /* Ajusta según tu diseño */
+  max-width: 1000px;
   height: auto;
   display: block;
   margin: 0 auto 20px auto;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: none;
+  transition: transform 0.35s ease;
+  transform-origin: center center;
+}
+
+.sorteo-banner:hover {
+  transform: scale(1.06);
+}
+
+/* Banner dinámico con overlay */
+.dynamic-banner {
+  position: relative;
+  width: 100%;
+  max-width: 1400px; /* Más ancho para mejorar lectura */
+  margin: 20px auto 30px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.sorteo-banner {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  max-height: 720px; /* Aún más grande para máxima legibilidad en desktop */
+}
+
+/* Overlay eliminado para mostrar la imagen limpia */
+
+/* Título del overlay eliminado */
+
+/* Descripción del overlay eliminada */
+
+/* Responsive del banner */
+@media (max-width: 768px) {
+  .dynamic-banner {
+    margin: 15px auto 25px auto;
+  }
+  
+  .sorteo-banner {
+  height: auto;
+  max-height: 420px; /* En móviles, más grande para mejor lectura */
+  }
+  
+  .banner-title {
+    font-size: 2rem;
+  }
+  
+  .banner-description {
+    font-size: 1rem;
+  }
+  
+  .banner-overlay {
+    padding: 20px 15px;
+  }
 }
 /* Cards */
 .cards {
@@ -125,15 +182,78 @@ h2 {
 
 .card {
   background-color: #2a2a2a;
-  border: 1px solid #ff7e00;
-  padding: 20px;
-  border-radius: 10px;
+  border: 2px solid #ff7e00;
+  border-radius: 15px;
   color: #ffffff;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(255, 126, 0, 0.4);
+  border-color: #e06f00;
+}
+
+.card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #1f1f1d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.premio-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  border-radius: 8px 8px 0 0;
+}
+
+.card:hover .premio-image {
+  transform: scale(1.05);
+}
+
+/* Placeholder SVG styling */
+.card-image svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Banner placeholder styling */
+.dynamic-banner svg {
+  width: 100%;
+  height: 720px; /* Consistente con max-height del banner en desktop */
+  object-fit: contain;
+  display: block;
+  transition: transform 0.35s ease;
+  transform-origin: center center;
+}
+
+.dynamic-banner svg:hover {
+  transform: scale(1.06);
+}
+
+.card-content {
+  padding: 20px;
 }
 
 .card h3 {
   color: #ff7e00;
-  margin-bottom: 10px;
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  font-family: "Anton", sans-serif;
+}
+
+.card p {
+  margin: 0;
+  line-height: 1.5;
+  color: #cccccc;
 }
 .footer {
   text-align: center;

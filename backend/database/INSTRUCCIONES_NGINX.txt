@@ -1,0 +1,88 @@
+# =======================================================
+# INSTRUCCIONES PARA ACTUALIZAR NGINX
+# =======================================================
+
+## 🔧 PASOS PARA APLICAR LA CONFIGURACIÓN:
+
+### 1. HACER BACKUP DEL ARCHIVO ACTUAL
+```cmd
+copy C:\nginx\conf\nginx.conf C:\nginx\conf\nginx.conf.backup
+```
+
+### 2. REEMPLAZAR CON LA NUEVA CONFIGURACIÓN
+- Copia el contenido del archivo "nginx_config_CORREGIDO.conf"
+- Reemplaza completamente el contenido de: C:\nginx\conf\nginx.conf
+
+### 3. VERIFICAR LA CONFIGURACIÓN
+```cmd
+cd C:\nginx
+nginx -t
+```
+
+### 4. REINICIAR NGINX
+```cmd
+cd C:\nginx
+nginx -s quit
+start nginx
+```
+
+### 5. VERIFICAR QUE ESTÁ FUNCIONANDO
+```cmd
+netstat -an | findstr :443
+netstat -an | findstr :80
+```
+
+# =======================================================
+# QUÉ CAMBIÓ EN LA CONFIGURACIÓN:
+# =======================================================
+
+✅ client_max_body_size 10M         - Permite archivos hasta 10MB
+✅ client_body_timeout 60s          - Más tiempo para uploads
+✅ client_header_timeout 60s        - Más tiempo para headers
+✅ client_body_buffer_size 16K      - Buffer optimizado
+✅ proxy_read_timeout 300s          - Timeout del proxy aumentado
+✅ proxy_buffering off              - Sin buffering para uploads grandes
+
+# =======================================================
+# SOLUCIÓN DE PROBLEMAS:
+# =======================================================
+
+## Si nginx no arranca:
+1. Verificar sintaxis: nginx -t
+2. Ver logs: type C:\nginx\logs\error.log
+3. Verificar permisos de archivos SSL
+
+## Si sigue dando error 413:
+1. Verificar que se aplicó la configuración
+2. Limpiar caché del navegador (Ctrl+F5)
+3. Verificar que el backend también tiene límites aumentados
+
+## Para verificar la configuración activa:
+```cmd
+nginx -T
+```
+
+# =======================================================
+# ALTERNATIVA: EDICIÓN MANUAL
+# =======================================================
+
+Si prefieres editar manualmente:
+
+1. Abre: C:\nginx\conf\nginx.conf
+2. Busca la sección "server" que escucha en el puerto 443
+3. Agrega DESPUÉS de "server_name":
+
+```
+client_max_body_size 10M;
+client_body_timeout 60s;
+client_header_timeout 60s;
+```
+
+4. En la sección "location /api" agrega:
+
+```
+proxy_read_timeout 300s;
+proxy_buffering off;
+```
+
+5. Guarda y reinicia nginx

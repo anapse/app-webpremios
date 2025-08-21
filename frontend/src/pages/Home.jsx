@@ -1,6 +1,5 @@
 import React from "react";
 import "../styles/main.css";
-import sorteoImg from "../assets/sorteo.png";
 
 import useFetch from "../hooks/useFetch";
 import apiRoutes from "../apiRoutes";
@@ -8,6 +7,7 @@ import apiRoutes from "../apiRoutes";
 import SorteoInfo from "../components/SorteoInfo";
 import BotonRegistro from "../components/BotonRegistro";
 import PremioCard from "../components/PremioCard";
+import DynamicBanner from "../components/DynamicBanner";
 
 export default function Home() {
 
@@ -99,11 +99,7 @@ export default function Home() {
         </p>
 
         <BotonRegistro />
-        <img
-          src={sorteoImg}
-          alt={`Próximo Sorteo - ${sorteo.nombre_sorteo}`}
-          className="sorteo-banner"
-        />
+        <DynamicBanner />
 
         <div className="cards">
           {loadingPremios && <p>Cargando premios...</p>}
@@ -120,6 +116,8 @@ export default function Home() {
                 key={premio.id}
                 titulo={`${premio.nombre} `}
                 descripcion={premio.descripcion}
+                imagen_url={premio.imagen_url}
+                imagen_base64={premio.imagen_base64}
               />
             ))}
         </div>

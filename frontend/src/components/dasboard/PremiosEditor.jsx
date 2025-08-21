@@ -68,6 +68,8 @@ const PremiosEditor = ({ sorteo }) => {
         cantidad: 1,
         tipo_premio: 1,
         sorteo_id: sorteo.id,
+        imagen_url: "",
+        imagen_base64: ""
       },
     ]);
     setMensaje("");
@@ -202,7 +204,36 @@ const handleGuardar = async () => {
             />
           </div>
 
-          {/* Columna 4: Eliminar */}
+          {/* Columna 4: Imagen URL */}
+          <div className="premio-columna">
+            <div className="premio-columna-titulo">Imagen URL</div>
+            <input
+              type="url"
+              placeholder="https://..."
+              className="imagen-url"
+              value={premio.imagen_url || ""}
+              onChange={(e) => handleChange(index, "imagen_url", e.target.value)}
+            />
+          </div>
+
+          {/* Columna 5: Vista previa */}
+          <div className="premio-columna">
+            <div className="premio-columna-titulo">Vista</div>
+            {(premio.imagen_url || premio.imagen_base64) && (
+              <div className="imagen-preview">
+                <img 
+                  src={premio.imagen_base64 || premio.imagen_url} 
+                  alt="Preview"
+                  className="preview-img"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Columna 6: Eliminar */}
           <div className="premio-columna">
             <div className="premio-columna-titulo">&nbsp;</div>
             <button 

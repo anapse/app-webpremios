@@ -35,7 +35,7 @@ async function getPremios(req, res) {
 
 // Crear premio
 const createPremio = async (req, res) => {
-    const { nombre, tipo_premio, cantidad, sorteo_id, descripcion } = req.body;
+    const { nombre, tipo_premio, cantidad, sorteo_id, descripcion, imagen_url, imagen_base64 } = req.body;
     if (!nombre || tipo_premio === undefined || cantidad === undefined) {
         return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
@@ -46,11 +46,13 @@ const createPremio = async (req, res) => {
             .input('tipo_premio', sql.Int, tipo_premio)
             .input('cantidad', sql.Int, cantidad)
             .input('sorteo_id', sql.Int, sorteo_id)
-            .input('descripcion', sql.NVarChar(sql.MAX), descripcion || null)  // Añadido
+            .input('descripcion', sql.NVarChar(sql.MAX), descripcion || null)
+            .input('imagen_url', sql.NVarChar(500), imagen_url || null)
+            .input('imagen_base64', sql.NVarChar(sql.MAX), imagen_base64 || null)
             .query(`
-        INSERT INTO premios (nombre, tipo_premio, cantidad, sorteo_id, descripcion)
+        INSERT INTO premios (nombre, tipo_premio, cantidad, sorteo_id, descripcion, imagen_url, imagen_base64)
         OUTPUT INSERTED.*
-        VALUES (@nombre, @tipo_premio, @cantidad, @sorteo_id, @descripcion)
+        VALUES (@nombre, @tipo_premio, @cantidad, @sorteo_id, @descripcion, @imagen_url, @imagen_base64)
       `);
 
         res.status(201).json(result.recordset[0]);
@@ -65,7 +67,7 @@ const createPremio = async (req, res) => {
 
 const updatePremioById = async (req, res) => {
     const { id } = req.params;
-    const { nombre, tipo_premio, cantidad, sorteo_id, descripcion } = req.body;
+    const { nombre, tipo_premio, cantidad, sorteo_id, descripcion, imagen_url, imagen_base64 } = req.body;
 
     try {
         const pool = await getConnection();
@@ -75,14 +77,18 @@ const updatePremioById = async (req, res) => {
             .input('tipo_premio', sql.Int, tipo_premio)
             .input('cantidad', sql.Int, cantidad)
             .input('sorteo_id', sql.Int, sorteo_id)
-            .input('descripcion', sql.NVarChar(sql.MAX), descripcion || null)  // Añadido
+            .input('descripcion', sql.NVarChar(sql.MAX), descripcion || null)
+            .input('imagen_url', sql.NVarChar(500), imagen_url || null)
+            .input('imagen_base64', sql.NVarChar(sql.MAX), imagen_base64 || null)
             .query(`
         UPDATE premios
         SET nombre = @nombre,
             tipo_premio = @tipo_premio,
             cantidad = @cantidad,
             sorteo_id = @sorteo_id,
-            descripcion = @descripcion
+            descripcion = @descripcion,
+            imagen_url = @imagen_url,
+            imagen_base64 = @imagen_base64
         OUTPUT INSERTED.*
         WHERE id = @id
       `);

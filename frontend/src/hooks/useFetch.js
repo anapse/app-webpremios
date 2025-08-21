@@ -52,7 +52,8 @@ export default function useFetch(url, options = {}) {
         const controller = new AbortController();
         lastControllerRef.current = controller;
 
-        const timer = setTimeout(() => controller.abort(new Error("timeout")), timeoutMs);
+        // Abortar con razón 'timeout' para distinguir de cleanup
+        const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);
 
         async function run() {
             try {
@@ -77,13 +78,27 @@ export default function useFetch(url, options = {}) {
                 setTimestamp(Date.now());
                 setStatus("success");
             } catch (e) {
+                // Manejo de abort: distinguir timeout vs cleanup/navegación
                 if (e?.name === "AbortError") {
-                    // abort normal o timeout -> si necesitas diferenciar, mira e.message
+                    const reason = lastControllerRef.current?.signal?.reason;
+                    const isTimeout = reason === 'timeout' || (e?.message && e.message.toLowerCase().includes('timeout'));
+                    const isCleanup = reason === 'cleanup' || (!reason && status !== 'loading');
+                    if (isCleanup) {
+                        // No mostrar error por cancelación normal (cleanup o navegación)
+                        return;
+                    }
+                    if (isTimeout) {
+                        setError('timeout');
+                        setStatus('error');
+                        return;
+                    }
+                    // Otros aborts: ignorar silenciosamente
                     return;
+                } else {
+                    console.error("❌ Fetch error:", e?.message || e, "→", url);
+                    setError(e?.message || "Error de red");
+                    setStatus("error");
                 }
-                console.error("❌ Fetch error:", e?.message || e, "→", url);
-                setError(e?.message || "Error de red");
-                setStatus("error");
             } finally {
                 clearTimeout(timer);
                 if (useGlobalLoader) hide();
@@ -94,7 +109,8 @@ export default function useFetch(url, options = {}) {
 
         return () => {
             clearTimeout(timer);
-            controller.abort();
+            // Abortar con razón 'cleanup' para no mostrar error
+            try { controller.abort('cleanup'); } catch { controller.abort(); }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [url, refetchTrigger.current]); // NO metas 'options' si cambian en cada render

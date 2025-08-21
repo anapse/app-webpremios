@@ -129,7 +129,7 @@ exports.getTickets = async (req, res) => {
         t.fecha,
         t.sorteo_id,
         s.nombre_sorteo,
-        s.fecha_sorteo,
+        s.sorteo_date,
         s.estado_sorteo
       FROM dbo.tickets t
       LEFT JOIN dbo.sorteo_config s ON t.sorteo_id = s.id
@@ -161,7 +161,7 @@ exports.getTicketsByDni = async (req, res) => {
           t.fecha,
           t.sorteo_id,
           s.nombre_sorteo,
-          s.fecha_sorteo,
+          s.sorteo_date,
           s.estado_sorteo
         FROM dbo.tickets t
         LEFT JOIN dbo.sorteo_config s ON t.sorteo_id = s.id
@@ -196,7 +196,7 @@ exports.getTicketByCode = async (req, res) => {
           t.fecha,
           t.sorteo_id,
           s.nombre_sorteo,
-          s.fecha_sorteo,
+          s.sorteo_date,
           s.estado_sorteo
         FROM dbo.tickets t
         LEFT JOIN dbo.sorteo_config s ON t.sorteo_id = s.id

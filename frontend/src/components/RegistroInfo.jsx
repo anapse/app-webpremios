@@ -7,7 +7,7 @@ const RegistroInfo = () => {
   const { data: sorteoData, loading: sorteoLoading, error: sorteoError } = useFetch(apiRoutes.proximoSorteo);
   const [precio, setPrecio] = useState(null);
   const [config, setConfig] = useState({
-    telefono_pagos: '912 391 502',
+    telefono_pagos: '000 000 000',
     qr_pago_base64: '',
     qr_pago_url: ''
   });
@@ -45,8 +45,8 @@ const RegistroInfo = () => {
     if (config.qr_pago_url) {
       return config.qr_pago_url;
     }
-    // Fallback a imagen por defecto en public
-    return '/yapeqr.png';
+    // Fallback a SVG placeholder genérico
+    return '/yape-qr-placeholder.svg';
   };
 
   return (
@@ -69,7 +69,7 @@ const RegistroInfo = () => {
                 alt="Código QR de pago" 
                 className="qr-image"
                 onError={(e) => {
-                  e.target.src = '/yapeqr.png'; // Fallback si falla la carga
+                  e.target.src = '/yape-qr-placeholder.svg'; // Fallback al SVG placeholder
                 }}
               />
             )}

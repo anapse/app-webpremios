@@ -104,7 +104,7 @@ const FormularioRegistro = () => {
       .replace(/{precio}/g, data?.ticket_price || 15);
 
     // Usar número desde configuración o fallback
-    const numeroWhatsApp = config?.telefono_notificaciones || '51912391502';
+    const numeroWhatsApp = config?.telefono_notificaciones || '51000000000';
     const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
     
     // Abrir WhatsApp en nueva ventana

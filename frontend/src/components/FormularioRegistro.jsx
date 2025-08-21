@@ -7,6 +7,7 @@ import departamentosPeru from '../data/departamentos';
 
 const FormularioRegistro = () => {
   const { data, loading, error } = useFetch(apiRoutes.proximoSorteo);
+  const { data: config, loading: configLoading } = useFetch('/api/config');
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
   
   const [formData, setFormData] = useState({
@@ -78,19 +79,32 @@ const FormularioRegistro = () => {
   };
 
   const enviarPorWhatsApp = (ticketData) => {
-    const mensaje = `🎫 *NUEVO TICKET REGISTRADO*\n\n` +
+    // Usar template desde configuración o fallback
+    let mensaje = config?.mensaje_whatsapp_template || 
+      `🎫 *NUEVO TICKET REGISTRADO*\n\n` +
       `*Datos del participante:*\n` +
-      `👤 Nombre: ${formData.nombres} ${formData.apellidos}\n` +
-      `🆔 DNI: ${formData.dni}\n` +
-      `📱 WhatsApp: ${formData.telefono}\n` +
-      `📍 Departamento: ${formData.departamento}\n` +
-      `🎟️ Código de ticket: ${ticketData.codigo_ticket}\n` +
-      `💰 Monto: S/ ${data?.ticket_price || 15}\n\n` +
+      `👤 Nombre: {nombres} {apellidos}\n` +
+      `🆔 DNI: {dni}\n` +
+      `📱 WhatsApp: {telefono}\n` +
+      `📍 Departamento: {departamento}\n` +
+      `🎟️ Código de ticket: {codigo_ticket}\n` +
+      `💰 Monto: S/ {precio}\n\n` +
       `⚠️ *TICKET PENDIENTE DE ACTIVACIÓN*\n` +
       `El ticket está desactivado hasta verificar el comprobante.\n\n` +
-      `#GameZtore #Ticket #${ticketData.codigo_ticket}`;
+      `#GameZtore #Ticket #{codigo_ticket}`;
 
-    const numeroWhatsApp = '51912391502'; // Número del administrador
+    // Reemplazar variables en el template
+    mensaje = mensaje
+      .replace(/{nombres}/g, formData.nombres)
+      .replace(/{apellidos}/g, formData.apellidos)
+      .replace(/{dni}/g, formData.dni)
+      .replace(/{telefono}/g, formData.telefono)
+      .replace(/{departamento}/g, formData.departamento)
+      .replace(/{codigo_ticket}/g, ticketData.codigo_ticket)
+      .replace(/{precio}/g, data?.ticket_price || 15);
+
+    // Usar número desde configuración o fallback
+    const numeroWhatsApp = config?.telefono_notificaciones || '51912391502';
     const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
     
     // Abrir WhatsApp en nueva ventana

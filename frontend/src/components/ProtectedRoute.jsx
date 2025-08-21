@@ -45,4 +45,4 @@ const ProtectedRoute = ({ children }) => {
 
 export default ProtectedRoute;
 
-export default ProtectedRoute;
+

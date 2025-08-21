@@ -229,7 +229,6 @@ button:hover {
   100% { transform: rotate(360deg); }
 }
 
-/* Estilos para el resultado del ticket */
 .resultado-ticket {
   text-align: center;
   padding: 2rem;
@@ -254,10 +253,31 @@ button:hover {
   font-family: "Anton", sans-serif;
 }
 
-.resultado-ticket button {
-  background: #ff7e00;
-  color: #1f1f1d;
-  border: 2px solid #ff7e00;
+.ticket-status {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid #ffc107;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.pending-status {
+  color: #ffc107;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 10px !important;
+}
+
+.info-text {
+  color: #e0dfde;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.btn-download {
+  background: #28a745;
+  color: white;
+  border: 2px solid #28a745;
   padding: 12px 24px;
   border-radius: 25px;
   font-weight: bold;
@@ -266,11 +286,105 @@ button:hover {
   font-family: "Montserrat", sans-serif;
 }
 
-.resultado-ticket button:hover {
-  background: #e06f00;
-  color: #1f1f1d;
+.btn-download:hover {
+  background: #218838;
+  border-color: #218838;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 126, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* Estilos para upload de archivo */
+.file-upload {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 2px dashed #ff7e00;
+  border-radius: 10px;
+  background: rgba(255, 126, 0, 0.1);
+  text-align: center;
+}
+
+.file-upload label {
+  display: block;
+  color: #ff7e00;
+  font-weight: bold;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.file-upload input[type="file"] {
+  background: transparent;
+  border: 1px solid #ff7e00;
+  border-radius: 5px;
+  padding: 10px;
+  color: white;
+  width: 100%;
+  cursor: pointer;
+}
+
+.file-upload input[type="file"]::-webkit-file-upload-button {
+  background: #ff7e00;
+  color: #1f1f1d;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  margin-right: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.file-selected {
+  color: #28a745;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+/* Mensaje de envío */
+.submit-message {
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.submit-message.success {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+.submit-message.error {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+/* Botón de envío mejorado */
+.btn-submit {
+  background: linear-gradient(135deg, #ff7e00 0%, #e06f00 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e06f00 0%, #c55f00 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 126, 0, 0.4);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Error styling */

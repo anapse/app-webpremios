@@ -45,8 +45,8 @@ const RegistroInfo = () => {
     if (config.qr_pago_url) {
       return config.qr_pago_url;
     }
-    // Fallback a imagen por defecto
-    return '/src/assets/yapeqr.png';
+    // Fallback a imagen por defecto en public
+    return '/yapeqr.png';
   };
 
   return (
@@ -69,7 +69,7 @@ const RegistroInfo = () => {
                 alt="Código QR de pago" 
                 className="qr-image"
                 onError={(e) => {
-                  e.target.src = '/src/assets/yapeqr.png'; // Fallback si falla la carga
+                  e.target.src = '/yapeqr.png'; // Fallback si falla la carga
                 }}
               />
             )}

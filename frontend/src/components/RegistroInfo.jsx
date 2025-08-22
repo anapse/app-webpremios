@@ -9,7 +9,8 @@ const RegistroInfo = () => {
   const [config, setConfig] = useState({
     telefono_pagos: '000 000 000',
     qr_pago_base64: '',
-    qr_pago_url: ''
+    qr_pago_url: '',
+    nombre_beneficiario_yape: 'Nombre del Beneficiario'
   });
   const [configLoading, setConfigLoading] = useState(true);
 
@@ -59,6 +60,9 @@ const RegistroInfo = () => {
           <div className="numero-container">
             <p className="numero">
               {configLoading ? 'Cargando...' : config.telefono_pagos}
+            </p>
+            <p className="beneficiario">
+              {configLoading ? 'Cargando...' : config.nombre_beneficiario_yape}
             </p>
           </div>
 

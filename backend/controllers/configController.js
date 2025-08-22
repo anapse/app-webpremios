@@ -14,10 +14,10 @@ exports.getConfig = async (req, res) => {
             // Si no existe configuración, crear una por defecto
             const defaultConfig = await pool.request().query(`
                 INSERT INTO dbo.sistema_config 
-                (telefono_notificaciones, telefono_pagos, mensaje_whatsapp_template)
+                (telefono_notificaciones, telefono_pagos, nombre_beneficiario_yape, mensaje_whatsapp_template)
                 OUTPUT INSERTED.*
                 VALUES 
-                ('51912391502', '51987654321', 
+                ('51000000000', '000 000 000', 'Nombre del Beneficiario',
                 '🎫 *NUEVO TICKET REGISTRADO*
 
 *Datos del participante:*
@@ -49,6 +49,7 @@ exports.updateConfig = async (req, res) => {
         const {
             telefono_notificaciones,
             telefono_pagos,
+            nombre_beneficiario_yape,
             qr_pago_base64,
             qr_pago_url,
             mensaje_whatsapp_template
@@ -68,15 +69,16 @@ exports.updateConfig = async (req, res) => {
             result = await pool.request()
                 .input('telefono_notificaciones', sql.VarChar(20), telefono_notificaciones)
                 .input('telefono_pagos', sql.VarChar(20), telefono_pagos)
+                .input('nombre_beneficiario_yape', sql.VarChar(100), nombre_beneficiario_yape)
                 .input('qr_pago_base64', sql.NVarChar(sql.MAX), qr_pago_base64)
                 .input('qr_pago_url', sql.VarChar(255), qr_pago_url)
                 .input('mensaje_whatsapp_template', sql.NVarChar(1000), mensaje_whatsapp_template)
                 .query(`
                     INSERT INTO dbo.sistema_config 
-                    (telefono_notificaciones, telefono_pagos, qr_pago_base64, qr_pago_url, mensaje_whatsapp_template)
+                    (telefono_notificaciones, telefono_pagos, nombre_beneficiario_yape, qr_pago_base64, qr_pago_url, mensaje_whatsapp_template)
                     OUTPUT INSERTED.*
                     VALUES 
-                    (@telefono_notificaciones, @telefono_pagos, @qr_pago_base64, @qr_pago_url, @mensaje_whatsapp_template)
+                    (@telefono_notificaciones, @telefono_pagos, @nombre_beneficiario_yape, @qr_pago_base64, @qr_pago_url, @mensaje_whatsapp_template)
                 `);
         } else {
             // Actualizar configuración existente
@@ -85,6 +87,7 @@ exports.updateConfig = async (req, res) => {
                 .input('id', sql.Int, configId)
                 .input('telefono_notificaciones', sql.VarChar(20), telefono_notificaciones)
                 .input('telefono_pagos', sql.VarChar(20), telefono_pagos)
+                .input('nombre_beneficiario_yape', sql.VarChar(100), nombre_beneficiario_yape)
                 .input('qr_pago_base64', sql.NVarChar(sql.MAX), qr_pago_base64)
                 .input('qr_pago_url', sql.VarChar(255), qr_pago_url)
                 .input('mensaje_whatsapp_template', sql.NVarChar(1000), mensaje_whatsapp_template)
@@ -94,6 +97,7 @@ exports.updateConfig = async (req, res) => {
                     SET 
                         telefono_notificaciones = @telefono_notificaciones,
                         telefono_pagos = @telefono_pagos,
+                        nombre_beneficiario_yape = @nombre_beneficiario_yape,
                         qr_pago_base64 = @qr_pago_base64,
                         qr_pago_url = @qr_pago_url,
                         mensaje_whatsapp_template = @mensaje_whatsapp_template,

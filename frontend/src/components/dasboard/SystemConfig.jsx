@@ -5,6 +5,7 @@ const SystemConfig = () => {
   const [config, setConfig] = useState({
     telefono_notificaciones: '',
     telefono_pagos: '',
+    nombre_beneficiario_yape: '',
     qr_pago_base64: '',
     qr_pago_url: '',
     mensaje_whatsapp_template: ''
@@ -156,6 +157,22 @@ const SystemConfig = () => {
                 value={config.telefono_pagos}
                 onChange={handleInputChange}
                 placeholder="Ej: 51987654321"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="nombre_beneficiario_yape">
+                Nombre del Beneficiario:
+                <span className="help-text">Nombre que aparecerá junto al número para identificar al beneficiario</span>
+              </label>
+              <input
+                type="text"
+                id="nombre_beneficiario_yape"
+                name="nombre_beneficiario_yape"
+                value={config.nombre_beneficiario_yape}
+                onChange={handleInputChange}
+                placeholder="Ej: Juan Pérez"
                 required
               />
             </div>

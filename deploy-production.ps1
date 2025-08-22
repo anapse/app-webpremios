@@ -26,7 +26,7 @@ Start-Sleep -Seconds 2
 
 # 5. Probar configuración de Nginx
 Write-Host "🔍 Probando configuración de Nginx..." -ForegroundColor Yellow
-$testResult = & "C:\nginx\nginx.exe" -t -c "C:\Users\Administrator\Desktop\app-webpremios\backend\database\nginx_config_PRODUCCION.conf" 2>&1
+$testResult = & "C:\nginx\nginx.exe" -t -c "C:\Users\Administrator\Desktop\app-webpremios\backend\config\nginx_config_PRODUCCION.conf" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Error en configuración de Nginx:" -ForegroundColor Red
     Write-Host $testResult
@@ -35,7 +35,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # 6. Iniciar Nginx con configuración de producción
 Write-Host "🚀 Iniciando Nginx..." -ForegroundColor Yellow
-Start-Process "C:\nginx\nginx.exe" -ArgumentList "-c", "C:\Users\Administrator\Desktop\app-webpremios\backend\database\nginx_config_PRODUCCION.conf" -WindowStyle Hidden
+Start-Process "C:\nginx\nginx.exe" -ArgumentList "-c", "C:\Users\Administrator\Desktop\app-webpremios\backend\config\nginx_config_PRODUCCION.conf" -WindowStyle Hidden
 
 # 7. Verificar que Nginx esté corriendo
 Start-Sleep -Seconds 3

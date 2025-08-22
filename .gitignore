@@ -6,9 +6,26 @@ dist/
 .DS_Store
 .vscode/
 .idea/
+
 # Ignorar carpetas específicas
 backend/node_modules/
 frontend/node_modules/
+
 # Ignorar archivo .env del backend
 backend/.env
 frontend/.env/
+
+# Ignorar carpetas de archivos temporales y base de datos antigua
+_archivos_temp/
+backend/database/
+
+# Ignorar certificados SSL
+*.crt
+*.key
+*.ca-bundle
+*.pem
+
+# Ignorar archivos de backup y temporales
+*.bak
+*.tmp
+*.temp

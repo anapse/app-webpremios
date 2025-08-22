@@ -130,6 +130,22 @@ const SystemConfig = () => {
             <h4>📱 Configuración de Teléfonos</h4>
             
             <div className="form-group">
+              <label htmlFor="nombre_beneficiario_yape">
+                Nombre del Beneficiario:
+                <span className="help-text">Nombre que aparecerá junto al número para identificar al beneficiario</span>
+              </label>
+              <input
+                type="text"
+                id="nombre_beneficiario_yape"
+                name="nombre_beneficiario_yape"
+                value={config.nombre_beneficiario_yape}
+                onChange={handleInputChange}
+                placeholder="Ej: Juan Pérez"
+                required
+              />
+            </div>
+
+            <div className="form-group">
               <label htmlFor="telefono_notificaciones">
                 WhatsApp para Notificaciones:
                 <span className="help-text">Número donde se enviarán los tickets para verificación</span>
@@ -157,22 +173,6 @@ const SystemConfig = () => {
                 value={config.telefono_pagos}
                 onChange={handleInputChange}
                 placeholder="Ej: 51987654321"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="nombre_beneficiario_yape">
-                Nombre del Beneficiario:
-                <span className="help-text">Nombre que aparecerá junto al número para identificar al beneficiario</span>
-              </label>
-              <input
-                type="text"
-                id="nombre_beneficiario_yape"
-                name="nombre_beneficiario_yape"
-                value={config.nombre_beneficiario_yape}
-                onChange={handleInputChange}
-                placeholder="Ej: Juan Pérez"
                 required
               />
             </div>

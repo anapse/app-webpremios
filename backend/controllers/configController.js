@@ -173,9 +173,7 @@ exports.getTicketsByStatus = async (req, res) => {
             ORDER BY t.fecha DESC
         `;
 
-        console.log('📋 Columnas disponibles:', existingColumns);
-        console.log('🔍 Query a ejecutar:', query);
-        console.log('📊 Filtro de estado:', status || 'todos');
+    
 
         const result = await pool.request().query(query);
 
@@ -233,8 +231,7 @@ exports.getPendingTickets = async (req, res) => {
             ORDER BY t.fecha DESC
         `;
 
-        console.log('📋 Columnas disponibles:', existingColumns);
-        console.log('🔍 Query a ejecutar:', query);
+     
 
         const result = await pool.request().query(query);
 

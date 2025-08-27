@@ -121,13 +121,13 @@ const TicketsManager = () => {
   const getStatusDisplay = (estado) => {
     switch (estado) {
       case 'pendiente':
-        return { text: 'PENDIENTE', class: 'pending' };
+        return { text: 'PEND.', class: 'pending' };
       case 'pagado':
-        return { text: 'ACEPTADO', class: 'accepted' };
+        return { text: 'ACEPT.', class: 'accepted' };
       case 'rechazado':
-        return { text: 'RECHAZADO', class: 'rejected' };
+        return { text: 'RECH.', class: 'rejected' };
       default:
-        return { text: estado.toUpperCase(), class: 'unknown' };
+        return { text: estado.toUpperCase().substr(0, 6), class: 'unknown' };
     }
   };
 

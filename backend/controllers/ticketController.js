@@ -99,7 +99,7 @@ exports.createTicket = async (req, res) => {
 
         await tx.commit();
 
-        console.log(`✅ Ticket creado: ${codigo_ticket} - Estado: ${estado_pago}`);
+
 
         return res.status(201).json({
             message: '🎫 Ticket registrado exitosamente',

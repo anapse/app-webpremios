@@ -2,18 +2,27 @@ import React, { useState, useEffect } from 'react';
 import './TicketsManager.css';
 
 const TicketsManager = () => {
-  const [ticketsPendientes, setTicketsPendientes] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
+  const [statusFilter, setStatusFilter] = useState('pendiente'); // Estado por defecto
 
-  // Cargar tickets pendientes
-  const cargarTicketsPendientes = async () => {
+  // Opciones del filtro de estado
+  const statusOptions = [
+    { value: 'pendiente', label: '⏳ Pendientes', count: 0 },
+    { value: 'pagado', label: '✅ Aceptados', count: 0 },
+    { value: 'rechazado', label: '❌ Rechazados', count: 0 },
+    { value: 'todos', label: '📋 Todos', count: 0 }
+  ];
+
+  // Cargar tickets por estado
+  const cargarTickets = async (status = statusFilter) => {
     setLoading(true);
     try {
-      console.log('🔄 Cargando tickets pendientes...');
-      const response = await fetch('/api/config/tickets/pending');
+      console.log(`🔄 Cargando tickets con estado: ${status}`);
+      const response = await fetch(`/api/config/tickets?status=${status}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -25,20 +34,20 @@ const TicketsManager = () => {
       // Verificar si hay error en la respuesta pero se envió un array vacío
       if (data.error && data.tickets) {
         console.warn('⚠️ Error en backend pero se recibió array:', data.error);
-        setTicketsPendientes(data.tickets); // Array vacío para evitar errores
+        setTickets(data.tickets); // Array vacío para evitar errores
         setMessage('⚠️ Problema al cargar tickets. Verifique la configuración de la base de datos.');
       } else if (Array.isArray(data)) {
-        setTicketsPendientes(data);
+        setTickets(data);
         setMessage('');
       } else {
         console.error('❌ Respuesta no es un array:', data);
-        setTicketsPendientes([]);
+        setTickets([]);
         setMessage('❌ Error: Respuesta inválida del servidor');
       }
       
     } catch (error) {
       console.error('❌ Error al cargar tickets:', error);
-      setTicketsPendientes([]); // Array vacío para evitar errores
+      setTickets([]); // Array vacío para evitar errores
       setMessage('❌ Error de conexión. Verifique que el servidor esté funcionando.');
     } finally {
       setLoading(false);
@@ -46,8 +55,14 @@ const TicketsManager = () => {
   };
 
   useEffect(() => {
-    cargarTicketsPendientes();
-  }, []);
+    cargarTickets();
+  }, [statusFilter]); // Recargar cuando cambie el filtro
+
+  // Manejar cambio de filtro
+  const handleStatusChange = (newStatus) => {
+    setStatusFilter(newStatus);
+    cargarTickets(newStatus);
+  };
 
   // Activar ticket
   const activarTicket = async (ticketId) => {
@@ -64,7 +79,7 @@ const TicketsManager = () => {
       
       if (response.ok) {
         alert(`✅ ${result.message}`);
-        cargarTicketsPendientes(); // Recargar lista
+        cargarTickets(); // Recargar lista
         setShowModal(false);
       } else {
         alert(`❌ Error: ${result.error}`);
@@ -90,7 +105,7 @@ const TicketsManager = () => {
       
       if (response.ok) {
         alert(`✅ Ticket rechazado: ${result.codigo_ticket}`);
-        cargarTicketsPendientes(); // Recargar lista
+        cargarTickets(); // Recargar lista
         setShowModal(false);
       } else {
         alert(`❌ Error: ${result.error}`);
@@ -98,6 +113,20 @@ const TicketsManager = () => {
     } catch (error) {
       console.error('Error al rechazar ticket:', error);
       alert('Error de conexión');
+    }
+  };
+
+  // Obtener estado en español y estilo
+  const getStatusDisplay = (estado) => {
+    switch (estado) {
+      case 'pendiente':
+        return { text: 'PENDIENTE', class: 'pending' };
+      case 'pagado':
+        return { text: 'ACEPTADO', class: 'accepted' };
+      case 'rechazado':
+        return { text: 'RECHAZADO', class: 'rejected' };
+      default:
+        return { text: estado.toUpperCase(), class: 'unknown' };
     }
   };
 
@@ -109,10 +138,23 @@ const TicketsManager = () => {
   return (
     <div className="tickets-manager">
       <div className="manager-header">
-        <h3>📋 Gestión de Tickets Pendientes</h3>
-        <button onClick={cargarTicketsPendientes} className="btn-refresh">
-          🔄 Actualizar
-        </button>
+        <h3>📋 Gestión de Tickets</h3>
+        <div className="header-controls">
+          <select 
+            value={statusFilter} 
+            onChange={(e) => handleStatusChange(e.target.value)}
+            className="status-filter"
+          >
+            {statusOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => cargarTickets()} className="btn-refresh">
+            🔄 Actualizar
+          </button>
+        </div>
       </div>
 
       {message && (
@@ -125,37 +167,45 @@ const TicketsManager = () => {
         <div className="loading">Cargando tickets...</div>
       ) : (
         <div className="tickets-grid">
-          {ticketsPendientes.length === 0 ? (
+          {tickets.length === 0 ? (
             <div className="no-tickets">
-              ✅ No hay tickets pendientes de activación
+              {statusFilter === 'pendiente' && '✅ No hay tickets pendientes'}
+              {statusFilter === 'pagado' && '📭 No hay tickets aceptados'}
+              {statusFilter === 'rechazado' && '📭 No hay tickets rechazados'}
+              {statusFilter === 'todos' && '📭 No hay tickets registrados'}
             </div>
           ) : (
-            ticketsPendientes.map((ticket) => (
-              <div key={ticket.id} className="ticket-card">
-                <div className="ticket-header">
-                  <h4>{ticket.codigo_ticket}</h4>
-                  <span className="ticket-status pending">PENDIENTE</span>
-                </div>
-                
-                <div className="ticket-info">
-                  <p><strong>Nombre:</strong> {ticket.nombres} {ticket.apellidos}</p>
-                  <p><strong>DNI:</strong> {ticket.dni}</p>
-                  <p><strong>Teléfono:</strong> {ticket.telefono}</p>
-                  <p><strong>Departamento:</strong> {ticket.departamento}</p>
-                  <p><strong>Fecha:</strong> {new Date(ticket.fecha).toLocaleString()}</p>
-                  <p><strong>Precio:</strong> S/ {ticket.ticket_price}</p>
-                </div>
+            tickets.map((ticket) => {
+              const statusDisplay = getStatusDisplay(ticket.estado_pago);
+              return (
+                <div key={ticket.id} className="ticket-card">
+                  <div className="ticket-header">
+                    <h4>{ticket.codigo_ticket}</h4>
+                    <span className={`ticket-status ${statusDisplay.class}`}>
+                      {statusDisplay.text}
+                    </span>
+                  </div>
+                  
+                  <div className="ticket-info">
+                    <p><strong>Nombre:</strong> {ticket.nombres} {ticket.apellidos}</p>
+                    <p><strong>DNI:</strong> {ticket.dni}</p>
+                    <p><strong>Teléfono:</strong> {ticket.telefono}</p>
+                    <p><strong>Departamento:</strong> {ticket.departamento}</p>
+                    <p><strong>Fecha:</strong> {new Date(ticket.fecha).toLocaleString()}</p>
+                    <p><strong>Precio:</strong> S/ {ticket.ticket_price}</p>
+                  </div>
 
-                <div className="ticket-actions">
-                  <button 
-                    onClick={() => verDetalles(ticket)}
-                    className="btn-details"
-                  >
-                    👁️ Ver Comprobante
-                  </button>
+                  <div className="ticket-actions">
+                    <button 
+                      onClick={() => verDetalles(ticket)}
+                      className="btn-details"
+                    >
+                      👁️ Ver Detalles
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
@@ -188,7 +238,11 @@ const TicketsManager = () => {
                 <div className="details-section">
                   <h4>💰 Información del Pago</h4>
                   <p><strong>Monto:</strong> S/ {selectedTicket.ticket_price}</p>
-                  <p><strong>Estado:</strong> <span className="status-pending">PENDIENTE</span></p>
+                  <p><strong>Estado:</strong> 
+                    <span className={`status-${getStatusDisplay(selectedTicket.estado_pago).class}`}>
+                      {getStatusDisplay(selectedTicket.estado_pago).text}
+                    </span>
+                  </p>
                 </div>
 
                 {selectedTicket.comprobante_base64 && (
@@ -207,18 +261,32 @@ const TicketsManager = () => {
             </div>
 
             <div className="modal-actions">
-              <button 
-                onClick={() => rechazarTicket(selectedTicket.id)}
-                className="btn-reject"
-              >
-                ❌ Rechazar
-              </button>
-              <button 
-                onClick={() => activarTicket(selectedTicket.id)}
-                className="btn-activate"
-              >
-                ✅ Activar Ticket
-              </button>
+              {selectedTicket.estado_pago === 'pendiente' && (
+                <>
+                  <button 
+                    onClick={() => rechazarTicket(selectedTicket.id)}
+                    className="btn-reject"
+                  >
+                    ❌ Rechazar
+                  </button>
+                  <button 
+                    onClick={() => activarTicket(selectedTicket.id)}
+                    className="btn-activate"
+                  >
+                    ✅ Activar Ticket
+                  </button>
+                </>
+              )}
+              {selectedTicket.estado_pago === 'pagado' && (
+                <div className="status-info accepted">
+                  ✅ Este ticket ya está activado
+                </div>
+              )}
+              {selectedTicket.estado_pago === 'rechazado' && (
+                <div className="status-info rejected">
+                  ❌ Este ticket fue rechazado
+                </div>
+              )}
             </div>
           </div>
         </div>

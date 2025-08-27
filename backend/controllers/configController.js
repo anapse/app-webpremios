@@ -120,7 +120,82 @@ exports.updateConfig = async (req, res) => {
     }
 };
 
-// Obtener tickets pendientes para el dashboard
+// Obtener tickets por estado (pendientes, pagado, rechazado, todos)
+exports.getTicketsByStatus = async (req, res) => {
+    try {
+        const { status } = req.query; // Obtener el estado desde query params
+        const pool = getConnection();
+
+        // Validar estados permitidos
+        const validStatuses = ['pendiente', 'pagado', 'rechazado', 'todos'];
+        if (status && !validStatuses.includes(status)) {
+            return res.status(400).json({ 
+                error: 'Estado inválido. Estados permitidos: pendiente, pagado, rechazado, todos' 
+            });
+        }
+
+        // Primero verificar qué columnas existen en la tabla tickets
+        const columnsCheck = await pool.request().query(`
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'tickets' 
+            AND COLUMN_NAME IN ('apellidos', 'comprobante_base64', 'sorteo_id')
+        `);
+
+        const existingColumns = columnsCheck.recordset.map(row => row.COLUMN_NAME);
+        const hasApellidos = existingColumns.includes('apellidos');
+        const hasComprobante = existingColumns.includes('comprobante_base64');
+        const hasSorteoId = existingColumns.includes('sorteo_id');
+
+        // Construir WHERE clause según el estado
+        let whereClause = '';
+        if (status && status !== 'todos') {
+            whereClause = `WHERE t.estado_pago = '${status}'`;
+        }
+
+        // Construir query dinámicamente según las columnas disponibles
+        let query = `
+            SELECT 
+                t.id,
+                t.codigo_ticket,
+                t.dni,
+                t.nombres,
+                ${hasApellidos ? 't.apellidos,' : "'' as apellidos,"}
+                t.telefono,
+                t.departamento,
+                t.estado_pago,
+                t.fecha,
+                ${hasComprobante ? 't.comprobante_base64,' : "'' as comprobante_base64,"}
+                ${hasSorteoId ? 's.nombre_sorteo, s.ticket_price' : "'Sorteo General' as nombre_sorteo, 10 as ticket_price"}
+            FROM dbo.tickets t
+            ${hasSorteoId ? 'LEFT JOIN dbo.sorteo_config s ON t.sorteo_id = s.id' : ''}
+            ${whereClause}
+            ORDER BY t.fecha DESC
+        `;
+
+        console.log('📋 Columnas disponibles:', existingColumns);
+        console.log('🔍 Query a ejecutar:', query);
+        console.log('📊 Filtro de estado:', status || 'todos');
+
+        const result = await pool.request().query(query);
+
+       
+        res.json(result.recordset);
+
+    } catch (error) {
+        console.error('❌ Error al obtener tickets por estado:', error.message);
+        console.error('📋 Stack trace:', error.stack);
+
+        // Enviar respuesta de error con array vacío para evitar problemas en frontend
+        res.status(500).json({
+            error: 'Error al obtener tickets',
+            message: error.message,
+            tickets: [] // Array vacío para que el frontend no falle
+        });
+    }
+};
+
+// Obtener tickets pendientes para el dashboard (mantener compatibilidad)
 exports.getPendingTickets = async (req, res) => {
     try {
         const pool = getConnection();
@@ -163,7 +238,7 @@ exports.getPendingTickets = async (req, res) => {
 
         const result = await pool.request().query(query);
 
-        console.log(`✅ Se encontraron ${result.recordset.length} tickets pendientes`);
+      
         res.json(result.recordset);
 
     } catch (error) {

@@ -8,6 +8,7 @@ const TicketsManager = () => {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
   const [statusFilter, setStatusFilter] = useState('pendiente'); // Estado por defecto
+  const [viewMode, setViewMode] = useState('cards'); // 'cards' o 'list'
 
   // Opciones del filtro de estado
   const statusOptions = [
@@ -151,6 +152,22 @@ const TicketsManager = () => {
               </option>
             ))}
           </select>
+          
+          <div className="view-toggle">
+            <label className="switch">
+              <input 
+                type="checkbox" 
+                checked={viewMode === 'list'}
+                onChange={(e) => setViewMode(e.target.checked ? 'list' : 'cards')}
+              />
+              <span className="slider">
+                <span className="switch-label">
+                  {viewMode === 'cards' ? '📋' : '🔲'} {viewMode === 'cards' ? 'Lista' : 'Tarjetas'}
+                </span>
+              </span>
+            </label>
+          </div>
+          
           <button onClick={() => cargarTickets()} className="btn-refresh">
             🔄 Actualizar
           </button>
@@ -166,7 +183,7 @@ const TicketsManager = () => {
       {loading ? (
         <div className="loading">Cargando tickets...</div>
       ) : (
-        <div className="tickets-grid">
+        <div className={viewMode === 'cards' ? 'tickets-grid' : 'tickets-list'}>
           {tickets.length === 0 ? (
             <div className="no-tickets">
               {statusFilter === 'pendiente' && '✅ No hay tickets pendientes'}
@@ -174,7 +191,8 @@ const TicketsManager = () => {
               {statusFilter === 'rechazado' && '📭 No hay tickets rechazados'}
               {statusFilter === 'todos' && '📭 No hay tickets registrados'}
             </div>
-          ) : (
+          ) : viewMode === 'cards' ? (
+            // Vista de tarjetas (actual)
             tickets.map((ticket) => {
               const statusDisplay = getStatusDisplay(ticket.estado_pago);
               return (
@@ -206,6 +224,48 @@ const TicketsManager = () => {
                 </div>
               );
             })
+          ) : (
+            // Vista de lista (nueva)
+            <div className="tickets-table">
+              <div className="table-header">
+                <div className="table-cell">Código</div>
+                <div className="table-cell">Nombre</div>
+                <div className="table-cell">DNI</div>
+                <div className="table-cell">Teléfono</div>
+                <div className="table-cell">Departamento</div>
+                <div className="table-cell">Estado</div>
+                <div className="table-cell">Fecha</div>
+                <div className="table-cell">Precio</div>
+                <div className="table-cell">Acciones</div>
+              </div>
+              {tickets.map((ticket) => {
+                const statusDisplay = getStatusDisplay(ticket.estado_pago);
+                return (
+                  <div key={ticket.id} className="table-row">
+                    <div className="table-cell">{ticket.codigo_ticket}</div>
+                    <div className="table-cell">{ticket.nombres} {ticket.apellidos}</div>
+                    <div className="table-cell">{ticket.dni}</div>
+                    <div className="table-cell">{ticket.telefono}</div>
+                    <div className="table-cell">{ticket.departamento}</div>
+                    <div className="table-cell">
+                      <span className={`ticket-status ${statusDisplay.class}`}>
+                        {statusDisplay.text}
+                      </span>
+                    </div>
+                    <div className="table-cell">{new Date(ticket.fecha).toLocaleDateString()}</div>
+                    <div className="table-cell">S/ {ticket.ticket_price}</div>
+                    <div className="table-cell">
+                      <button 
+                        onClick={() => verDetalles(ticket)}
+                        className="btn-details-small"
+                      >
+                        👁️
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       )}

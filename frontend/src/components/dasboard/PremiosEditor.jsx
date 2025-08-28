@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import usePost from "../../hooks/usePost";
 import usePatch from "../../hooks/usePatch";
+import useDelete from "../../hooks/useDelete";
 import apiRoutes from "../../apiRoutes";
 import "../../styles/dashboard.css";
 
@@ -17,10 +18,12 @@ const PremiosEditor = ({ sorteo }) => {
 
   const { postData } = usePost(apiRoutes.premios);
   const { patchData } = usePatch(apiRoutes.premios);
+  const { deleteData } = useDelete();
 
   const [premios, setPremios] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [eliminando, setEliminando] = useState(null);
 
   const generateTempId = () => Date.now() + Math.random();
 
@@ -75,9 +78,58 @@ const PremiosEditor = ({ sorteo }) => {
     setMensaje("");
   };
 
-  const handleRemove = (index) => {
-    setPremios((prev) => prev.filter((_, i) => i !== index));
-    setMensaje("");
+  const handleRemove = async (index) => {
+    const premio = premios[index];
+    
+    // Si el premio tiene ID (existe en la base de datos), eliminarlo del servidor
+    if (premio.id) {
+      const confirmDelete = window.confirm(
+        `¿Estás seguro de que quieres eliminar "${premio.nombre}"? Esta acción no se puede deshacer.`
+      );
+      
+      if (!confirmDelete) return;
+      
+      setEliminando(premio.id);
+      setMensaje("🗑️ Eliminando premio...");
+      
+      try {
+        console.log(`🗑️ Eliminando premio ${premio.nombre} (ID: ${premio.id})`);
+        
+        // Crear URL específica para este premio
+        const deleteUrl = `${apiRoutes.premios}/${premio.id}`;
+        console.log("🌐 URL de eliminación:", deleteUrl);
+        
+        const response = await fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `Error ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log("✅ Premio eliminado del servidor:", result);
+        
+        // Remover de la lista local
+        setPremios((prev) => prev.filter((_, i) => i !== index));
+        setMensaje(`✅ Premio "${premio.nombre}" eliminado correctamente`);
+        
+      } catch (error) {
+        console.error("❌ Error al eliminar premio:", error);
+        setMensaje(`❌ Error al eliminar premio: ${error.message}`);
+      } finally {
+        setEliminando(null);
+      }
+    } else {
+      // Si no tiene ID, solo remover de la lista local
+      console.log(`📝 Removiendo premio temporal: ${premio.nombre}`);
+      setPremios((prev) => prev.filter((_, i) => i !== index));
+      setMensaje("Premio removido de la lista");
+    }
   };
 
   const validarPremios = () => {
@@ -239,9 +291,10 @@ const handleGuardar = async () => {
             <button 
               className="btn-eliminar"
               onClick={() => handleRemove(index)}
-              title="Eliminar premio"
+              disabled={eliminando === premio.id}
+              title={premio.id ? "Eliminar premio de la base de datos" : "Remover premio de la lista"}
             >
-              ×
+              {eliminando === premio.id ? "⏳" : "×"}
             </button>
           </div>
         </div>

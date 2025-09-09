@@ -1,5 +1,19 @@
-// Configuración para VPS
-const API_BASE_URL = '/api';
+// Configuración para desarrollo y producción
+const isGitHubPages = window.location.hostname === 'anapse.github.io';
+const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+let API_BASE_URL;
+
+if (isGitHubPages) {
+    // En GitHub Pages, usar la URL de producción
+    API_BASE_URL = 'https://77.237.239.180:3000/api';
+} else if (isLocalDev) {
+    // En desarrollo local, usar rutas relativas con proxy
+    API_BASE_URL = import.meta.env.VITE_API_BASE || '/api';
+} else {
+    // Para otras configuraciones, usar variable de entorno o relativo
+    API_BASE_URL = import.meta.env.VITE_API_BASE || '/api';
+}
 
 const apiRoutes = {
     // Sorteos

@@ -26,10 +26,18 @@ const hasRealCredentials = () => {
     return hasReal;
 };
 
-// ---- NUEVAS RUTAS SEGÚN DOCUMENTACIÓN DEL BOTÓN DE PAGO WEB ----
+// ---- ENDPOINTS PRINCIPALES SEGÚN DOCUMENTACIÓN ----
 
-// Crear sesión de pago (nuevo flujo correcto)
+// POST /api/niubiz/session - Alias para session/create
+router.post('/session', (req, res) => {
+    console.log('📝 POST /session - redirigiendo a /session/create');
+    return niubizController.createSession(req, res);
+});
+
+// POST /api/niubiz/session/create - Crear token de sesión para Botón de Pago Web
 router.post('/session/create', (req, res) => {
+    console.log('📝 POST /session/create - Body:', req.body);
+
     if (hasRealCredentials()) {
         return niubizController.createSession(req, res);
     }
@@ -42,14 +50,15 @@ router.post('/session/create', (req, res) => {
         merchantId: 'TEST_MERCHANT',
         amount: req.body.amount,
         currency: 'PEN',
-        checkoutUrl: 'https://pocpaymentserve.s3.amazonaws.com/checkout.js',
+        checkoutUrl: 'https://static-content-qas.vnforapps.com/v2/js/checkout.js?qa=true',
         testMode: true,
         message: "Modo de prueba - Sesión simulada para Botón de Pago Web"
     });
 });
 
-// Autorizar transacción (después del checkout web)
-router.post('/authorize', (req, res) => {
+// POST /api/niubiz/confirm - Alias para authorize
+router.post('/confirm', (req, res) => {
+    console.log('📝 POST /confirm - redirigiendo a authorize');
     if (hasRealCredentials()) {
         return niubizController.authorizeTransaction(req, res);
     }
@@ -62,94 +71,64 @@ router.post('/authorize', (req, res) => {
             AMOUNT: req.body.amount,
             CURRENCY: "PEN",
             TRANSACTION_ID: `TXN_TEST_${Date.now()}`,
-            PURCHASE_NUMBER: req.body.purchaseNumber
+            PURCHASE_NUMBER: req.body.purchaseNumber,
+            AUTHORIZATION_CODE: "123456",
+            TRACE_NUMBER: "000001",
+            ORDER_ID: req.body.purchaseNumber
         },
         testMode: true,
         message: "Modo de prueba - Transacción aprobada automáticamente"
     });
 });
 
-// ---- RUTAS DE COMPATIBILIDAD (LEGACY) ----
+// POST /api/niubiz/authorize - Autorizar transacción después del checkout
+router.post('/authorize', (req, res) => {
+    console.log('📝 POST /authorize - Body:', req.body);
 
-// Endpoint para formulario web de Niubiz (legacy)
+    if (hasRealCredentials()) {
+        return niubizController.authorizeTransaction(req, res);
+    }
+
+    // Modo de prueba con autorización simulada
+    return res.json({
+        dataMap: {
+            ACTION_CODE: "000",
+            ACTION_DESCRIPTION: "Aprobado",
+            AMOUNT: req.body.amount,
+            CURRENCY: "PEN",
+            TRANSACTION_ID: `TXN_TEST_${Date.now()}`,
+            PURCHASE_NUMBER: req.body.purchaseNumber,
+            AUTHORIZATION_CODE: "123456",
+            TRACE_NUMBER: "000001",
+            ORDER_ID: req.body.purchaseNumber
+        },
+        testMode: true,
+        message: "Modo de prueba - Transacción aprobada automáticamente"
+    });
+});
+
+// ---- ENDPOINTS DE COMPATIBILIDAD (LEGACY) ----
+
+// POST /api/niubiz/payment - Endpoint legacy que redirige a session/create
 router.post('/payment', (req, res) => {
-    if (hasRealCredentials()) {
-        return niubizController.createSession(req, res);
-    }
-
-    // Modo de prueba con formulario simulado
-    const purchaseNumber = Date.now().toString().slice(-10);
-    return res.json({
-        purchaseNumber,
-        sessionKey: `mock-session-${purchaseNumber}`,
-        expirationTime: 900000, // 15 minutos
-        merchantId: 'mock-merchant',
-        amount: req.body.amount,
-        currency: 'PEN',
-        paymentUrl: 'https://example.com/mock-payment',
-        testMode: true,
-        message: "Modo de prueba - Configurar credenciales reales de Niubiz"
-    });
+    console.log('📝 POST /payment (legacy) - redirigiendo a /session/create');
+    req.url = '/session/create';
+    return router.handle(req, res);
 });
 
-// Mock mejorado para pruebas con QR simulado (legacy)
+// POST /api/niubiz/yape/create - Endpoint legacy que redirige a session/create  
 router.post('/yape/create', (req, res) => {
-    if (hasRealCredentials()) {
-        return niubizController.createYape(req, res);
-    }
-
-    // Modo de prueba con QR simulado
-    const purchaseNumber = Date.now().toString().slice(-10);
-
-    // QR de prueba (imagen base64 pequeña de ejemplo)
-    const qrBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
-
-    return res.json({
-        purchaseNumber,
-        transactionId: `TX-TEST-${purchaseNumber}`,
-        qrBase64,
-        deepLink: `yape://pay?amount=${req.body.amount}&merchant=TEST`,
-        testMode: true,
-        message: "Modo de prueba - Configurar credenciales reales de Niubiz"
-    });
+    console.log('📝 POST /yape/create (legacy) - redirigiendo a /session/create');
+    req.url = '/session/create';
+    return router.handle(req, res);
 });
 
-// Simulador de estados de pago para pruebas
-const testTransactions = new Map();
-
+// GET /api/niubiz/yape/status - Ya no necesario con Botón de Pago Web
 router.get('/yape/status', (req, res) => {
-    if (hasRealCredentials()) {
-        return niubizController.getYapeStatus(req, res);
-    }
-
-    const { purchaseNumber } = req.query;
-    if (!purchaseNumber) {
-        return res.status(400).json({ error: 'purchaseNumber requerido' });
-    }
-
-    // Simular progresión de estados para pruebas
-    if (!testTransactions.has(purchaseNumber)) {
-        testTransactions.set(purchaseNumber, {
-            status: 'PENDING',
-            created: Date.now(),
-            attempts: 0
-        });
-    }
-
-    const transaction = testTransactions.get(purchaseNumber);
-    transaction.attempts++;
-
-    // Después de 3 consultas (simulando 15 segundos), aprobar la transacción
-    if (transaction.attempts >= 3) {
-        transaction.status = 'APPROVED';
-    }
-
+    console.log('ℹ️ GET /yape/status - No se necesita polling en Botón de Pago Web');
     return res.json({
-        status: transaction.status,
-        transactionId: `TX-TEST-${purchaseNumber}`,
-        token: transaction.status === 'APPROVED' ? `TOKEN-${purchaseNumber}` : null,
-        testMode: true,
-        attempt: transaction.attempts
+        status: 'USE_WEB_CHECKOUT',
+        message: 'Usar Botón de Pago Web en lugar de polling'
     });
 });
 

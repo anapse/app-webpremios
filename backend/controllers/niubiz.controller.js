@@ -53,13 +53,10 @@ async function getAccessToken() {
     const basic = Buffer.from(credentials).toString('base64');
 
     console.log('🔍 Credentials verificadas:', {
-        user: NIUBIZ_USER,
         userLength: NIUBIZ_USER.length,
         passLength: NIUBIZ_PASS.length,
-        passHasAt: NIUBIZ_PASS.includes('@'),
-        passHasUnderscore: NIUBIZ_PASS.includes('_'),
-        credentialsString: credentials,
-        base64Preview: basic.substring(0, 20) + '...'
+        credentialsLength: credentials.length,
+        base64Length: basic.length
     });
 
     const url = `${NIUBIZ_BASE}/api.security/v1/security`;
@@ -75,7 +72,6 @@ async function getAccessToken() {
         });
 
         console.log('✅ Token obtenido exitosamente');
-        console.log('📊 Token response:', JSON.stringify(response.data, null, 2));
         return response.data;
     } catch (error) {
         console.error('❌ Error obteniendo token:', {
@@ -83,9 +79,7 @@ async function getAccessToken() {
             statusText: error.response?.statusText,
             data: error.response?.data,
             message: error.message,
-            url: url,
-            credentials: credentials,
-            base64Auth: basic
+            url: url
         });
 
         // Si es error 401, verificar si las credenciales están configuradas correctamente
@@ -131,11 +125,11 @@ exports.createSession = async (req, res) => {
             channel: "web",
             amount: parseFloat(amount),
             antifraud: {
-                clientIp: req.ip || "127.0.0.1",
+                clientIp: req.ip,
                 merchantDefineData: {
-                    MDD4: customer.email || `${customer.dni || 'noemail'}@gameztore.com`,
-                    MDD32: customer.dni || `CUSTOMER_${Date.now()}`,
-                    MDD75: "Registrado",
+                    MDD4: customer.email || `${customer.dni}@gameztore.com`,
+                    MDD32: customer.email || `${customer.dni}@gameztore.com`,
+                    MDD75: "invitado",
                     MDD77: 1
                 }
             },
@@ -172,7 +166,7 @@ exports.createSession = async (req, res) => {
             currency: currency,
             // URL del script de checkout según documentación oficial
             checkoutUrl: NIUBIZ_BASE.includes('sandbox')
-                ? 'https://pocpaymentserve.s3.amazonaws.com/payform.min.js'
+                ? 'https://static-content-qas.vnforapps.com/v2/js/checkout.js?qa=true'
                 : 'https://static-content.vnforapps.com/v2/js/checkout.js'
         };
 
@@ -215,14 +209,22 @@ exports.authorizeTransaction = async (req, res) => {
             });
         }
 
+        // Validar que purchaseNumber sea numérico y máximo 12 dígitos
+        if (!/^\d{1,12}$/.test(purchaseNumber)) {
+            return res.status(400).json({
+                error: 'purchaseNumber debe ser numérico con máximo 12 dígitos'
+            });
+        }
+
         const accessToken = await getAccessToken();
 
+        // Formato v3 compatible: tokenId fuera de order
         const payload = {
             channel: "web",
             captureType: "manual",
             countable: true,
+            tokenId: transactionToken,
             order: {
-                tokenId: transactionToken,
                 purchaseNumber: purchaseNumber,
                 amount: parseFloat(amount),
                 currency: currency

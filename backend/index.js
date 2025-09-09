@@ -1,32 +1,37 @@
 // index.js
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS para VPS
-const corsOptions = {
-    origin: [
-        'http://77.237.239.180',
-        'http://77.237.239.180:80',
-        'http://77.237.239.180:3000',
-        'http://localhost:5173',
-        'https://localhost:5173',
-        'http://localhost:3000',
-        'http://gameztorepremios.com',   // <-- agrega aquí
-        'https://gameztorepremios.com',   // <-- y HTTPS si usas
-        'https://gameztorepremios.com:5173'
+// Sin CORS en desarrollo
 
-    ],
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+/*
+// CORS permisivo para desarrollo
+const corsOptions = {
+    origin: true, // Permite todos los orígenes
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true
 };
 
 app.use(cors(corsOptions));
 
+// Middleware adicional para CORS
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+    // Responder a preflight requests
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
+*/
 // Aumentar límites para archivos grandes (imágenes)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -67,10 +72,10 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-// Escuchar
+// Escuchar en todas las interfaces para desarrollo
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Servidor corriendo en VPS:`);
-    console.log(`   IP: http://77.237.239.180:${PORT}`);
-    console.log(`   Local: http://localhost:${PORT}`);
+    console.log(`   IP Externa: http://77.237.239.180:${PORT}`);
+    console.log(`   Localhost: http://127.0.0.1:${PORT}`);
     console.log(`   Todas las interfaces: 0.0.0.0:${PORT}`);
 });

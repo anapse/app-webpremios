@@ -38,6 +38,26 @@
   color: #ff7e00;
 }
 
+/* Botón especial de Niubiz */
+.niubiz-btn {
+  background: linear-gradient(135deg, #ff7e00 0%, #e06f00 100%) !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(255, 126, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.niubiz-btn:hover {
+  background: linear-gradient(135deg, #e06f00 0%, #c55f00 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(255, 126, 0, 0.4) !important;
+  color: white !important;
+}
+
 /* Botones de login/logout */
 .login-btn, .logout-btn {
   background: linear-gradient(135deg, #ff7e00 0%, #e06f00 100%);
@@ -290,6 +310,16 @@
 
   .navbar-links a:last-child {
     border-bottom: none;
+  }
+
+  /* Botón Niubiz en móvil */
+  .navbar-links .niubiz-btn {
+    background: linear-gradient(135deg, #ff7e00 0%, #e06f00 100%) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 6px !important;
+    margin: 4px 0 !important;
+    text-align: center !important;
   }
   
   .navbar-links .login-btn,

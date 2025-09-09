@@ -15,6 +15,7 @@ const Home = lazy(() => import('./pages/Home'))
 const Tickets = lazy(() => import('./pages/Tickets'))
 const Winners = lazy(() => import('./pages/Winners'))
 const RegistroPage = lazy(() => import('./pages/RegistroPage'))
+const RegistroNiubizPage = lazy(() => import('./pages/RegistroNiubizPage'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Terminos = lazy(() => import('./pages/Terminos'));
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/tickets" element={<Tickets />} />
             <Route path="/ganadores" element={<Winners />} />
             <Route path="/registro" element={<RegistroPage />} />
+            <Route path="/niubiz" element={<RegistroNiubizPage />} />
             <Route path="/libro-reclamaciones" element={<LibroReclamaciones/>} />
             <Route path="/terminos" element={<Terminos />} />
             <Route 

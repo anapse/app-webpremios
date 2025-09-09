@@ -1,42 +1,31 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import fs from 'fs'
 
 export default defineConfig({
   plugins: [react()],
+  base: process.env.NODE_ENV === 'production' ? '/app-webpremios/' : '/',
   build: {
-    // Optimizaciones de build
-    minify: 'terser',
-    chunkSizeWarningLimit: 1000,
+    outDir: 'dist',
+    assetsDir: 'assets',
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom']
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          pdf: ['jspdf']
         }
       }
     }
   },
   server: {
-    host: '0.0.0.0',
+    host: true,
     port: 5173,
-    https: {
-      key: fs.readFileSync('C:/nginx/ssl/gameztorepremios_com.key'),
-      cert: fs.readFileSync('C:/nginx/ssl/gameztorepremios_com.crt'),
-    },
-    hmr: {
-      protocol: 'wss',
-      host: 'gameztorepremios.com',
-      clientPort: 443
-    },
-    // Proxy de desarrollo para evitar CORS cuando se llama a /api desde Vite
+    https: false,
+    strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://127.0.0.1:3000',
         changeOrigin: true,
-        secure: false,
-        // opcional: reescritura si sirves backend bajo otro prefijo
-        // rewrite: (path) => path.replace(/^\/api/, '/api'),
+        secure: false
       }
     }
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { jsPDF } from 'jspdf';
 import '../styles/FormularioRegistro.css';
 import useFetch from '../hooks/useFetch';
@@ -14,10 +14,7 @@ const FormularioRegistro = () => {
   });
 
   const [ticketCode, setTicketCode] = useState(null);
-  const [yapeQR, setYapeQR] = useState(null);
-  const [deepLink, setDeepLink] = useState(null);
   const [txInfo, setTxInfo] = useState(null);
-  const pollingRef = useRef(null);
 
   const [creating, setCreating] = useState(false);
   const [errMsg, setErrMsg] = useState('');
@@ -37,11 +34,6 @@ const FormularioRegistro = () => {
     return () => clearInterval(t);
   }, [data]);
 
-  useEffect(() => {
-    // cleanup del polling si desmonta
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
@@ -55,10 +47,11 @@ const FormularioRegistro = () => {
 
     try {
       setCreating(true);
-      console.log('[API] POST /api/niubiz/session/create - Botón de Pago Web');
+      console.log('[API] POST /api/niubiz/session - Botón de Pago Web');
       
       // Crear sesión de pago según documentación oficial
-      const res = await fetch('/api/niubiz/session/create', {
+      // Llamar al endpoint correcto
+      const res = await fetch('/api/niubiz/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,52 +86,51 @@ const FormularioRegistro = () => {
         return;
       }
 
-      // Mostrar información de modo de prueba si aplica
-      if (r.testMode) {
-        console.log('🧪 MODO DE PRUEBA ACTIVADO - Configurar credenciales reales de Niubiz');
-        // En modo prueba, simular pago exitoso después de 3 segundos
+      // Solo usar modo simulación si NO tenemos sessionKey real
+      if (r.testMode && !r.sessionKey) {
+        console.log('🧪 MODO DE PRUEBA ACTIVADO - Sin credenciales reales de Niubiz');
+        
+        // En modo prueba, mostrar UI bonita y simular pago exitoso
         setTxInfo({ 
           purchaseNumber: Date.now().toString().slice(-10), 
           transactionId: `TEST-${Date.now()}`,
-          testMode: true
+          testMode: true,
+          sessionData: r,
+          reason: 'Credenciales de test'
         });
+        
+        // Simular proceso de pago con progreso visual
         setTimeout(() => {
-          console.log('🎭 Simulando pago exitoso...');
-          procearPagoExitoso(`TEST-${Date.now()}`, `PN-${Date.now()}`);
-        }, 3000);
+          console.log('🎭 Simulando autorización automática...');
+          procearPagoExitoso(`TEST-${Date.now()}`, Date.now().toString().slice(-10));
+        }, 4000);
         return;
       }
 
-      // Cargar librería de Niubiz y configurar checkout
-      try {
-        await cargarLibreriaNiubiz(r.checkoutUrl);
-        const purchaseNumber = Date.now().toString().slice(-10);
+      // Si tenemos sessionKey, intentar checkout real aunque sea HTTP
+      if (r.sessionKey) {
+        console.log('✅ SessionKey real obtenida, intentando checkout real de Niubiz');
         
-        setTxInfo({ 
-          sessionKey: r.sessionKey,
-          merchantId: r.merchantId,
-          purchaseNumber: purchaseNumber,
-          amount: r.amount,
-          expirationTime: r.expirationTime
-        });
+        // Cargar librería de Niubiz y configurar checkout
+        try {
+          await cargarLibreriaNiubiz(r.checkoutUrl);
+          const purchaseNumber = Date.now().toString().slice(-10);
+          
+          setTxInfo({ 
+            sessionKey: r.sessionKey,
+            merchantId: r.merchantId,
+            purchaseNumber: purchaseNumber,
+            amount: r.amount,
+            expirationTime: r.expirationTime
+          });
 
-        configurarCheckoutNiubiz(r, purchaseNumber);
-      } catch (libError) {
-        console.error('❌ Error cargando librería:', libError);
-        console.log('🎭 Activando modo simulación por error de librería...');
-        
-        // Fallback: simular el proceso en modo sandbox
-        setTxInfo({ 
-          purchaseNumber: Date.now().toString().slice(-10), 
-          transactionId: `FALLBACK-${Date.now()}`,
-          testMode: true,
-          fallbackMode: true
-        });
-        
-        setTimeout(() => {
-          console.log('🎭 Simulando pago exitoso (fallback)...');
-          procearPagoExitoso(`FALLBACK-${Date.now()}`, `FB-${Date.now()}`);
-        }, 3000);
+          configurarCheckoutNiubiz(r, purchaseNumber);
+        } catch (libError) {
+          console.error('❌ Error cargando librería de Niubiz:', libError);
+          setErrMsg('No se pudo cargar el checkout de Niubiz. Verifique que esté en HTTPS o contacte soporte.');
+          setCreating(false);
+          return;
+        }
         return;
       }
 
@@ -153,134 +145,149 @@ const FormularioRegistro = () => {
   // Cargar librería de Niubiz dinámicamente
   const cargarLibreriaNiubiz = (checkoutUrl) => {
     return new Promise((resolve, reject) => {
-      console.log('📦 Intentando cargar librería de Niubiz desde:', checkoutUrl);
+      console.log('📦 Cargando librería oficial de Niubiz:', checkoutUrl);
       
-      // Lista de URLs de fallback para probar
-      const urlsToTry = [
-        checkoutUrl,
-        'https://pocpaymentserve.s3.amazonaws.com/payform.min.js',
-        'https://static-content.vnforapps.com/v2/js/checkout.js',
-        'https://pocpaymentserve.s3.amazonaws.com/checkout.js'
-      ];
+      // Verificar si ya está cargado
+      if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
+        console.log('✅ VisanetCheckout ya está cargado');
+        resolve();
+        return;
+      }
 
-      let currentUrlIndex = 0;
+      // Limpiar scripts anteriores de Niubiz
+      const existingScripts = document.querySelectorAll('script[src*="checkout"], script[src*="payform"], script[src*="vnforapps"]');
+      existingScripts.forEach(script => {
+        script.remove();
+        console.log('🧹 Script anterior eliminado:', script.src);
+      });
 
-      const tryLoadScript = () => {
-        if (currentUrlIndex >= urlsToTry.length) {
-          reject(new Error('No se pudo cargar ninguna librería de Niubiz'));
-          return;
-        }
-
-        const currentUrl = urlsToTry[currentUrlIndex];
-        console.log(`📥 Probando URL ${currentUrlIndex + 1}/${urlsToTry.length}: ${currentUrl}`);
-
-        // Verificar si ya está cargado
-        if (window.VisanetCheckout || window.Culqi || window.Niubiz) {
-          console.log('✅ Librería ya está cargada');
-          resolve();
-          return;
-        }
-
-        // Limpiar scripts anteriores
-        const existingScript = document.querySelector(`script[src="${currentUrl}"]`);
-        if (existingScript) {
-          existingScript.remove();
-          console.log('🧹 Script anterior eliminado');
-        }
-
-        const script = document.createElement('script');
-        script.src = currentUrl;
-        script.async = true;
-        script.crossOrigin = 'anonymous';
+      const script = document.createElement('script');
+      script.src = checkoutUrl; // Usar solo la URL oficial del backend
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      
+      script.onload = () => {
+        console.log(`✅ Script cargado desde: ${checkoutUrl}`);
         
-        script.onload = () => {
-          console.log(`✅ Script cargado desde: ${currentUrl}`);
-          
-          // Verificar qué objeto global está disponible
-          if (window.VisanetCheckout) {
-            console.log('✅ VisanetCheckout disponible');
-            resolve();
-          } else if (window.Culqi) {
-            console.log('✅ Culqi disponible (alternativo)');
-            window.VisanetCheckout = window.Culqi; // Fallback
-            resolve();
-          } else if (window.Niubiz) {
-            console.log('✅ Niubiz disponible (alternativo)');
-            window.VisanetCheckout = window.Niubiz; // Fallback
+        // Verificar que VisanetCheckout esté disponible
+        setTimeout(() => {
+          if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
+            console.log('✅ VisanetCheckout.configure disponible');
             resolve();
           } else {
-            console.log(`⚠️ Script cargado pero objeto no disponible, probando siguiente URL...`);
-            currentUrlIndex++;
-            tryLoadScript();
+            console.error('❌ VisanetCheckout no disponible después de la carga');
+            reject(new Error('VisanetCheckout no disponible después de cargar la librería'));
           }
-        };
-        
-        script.onerror = (error) => {
-          console.error(`❌ Error cargando desde ${currentUrl}:`, error);
-          currentUrlIndex++;
-          tryLoadScript();
-        };
-        
-        document.head.appendChild(script);
+        }, 1000); // Dar más tiempo para la inicialización
       };
-
-      tryLoadScript();
+      
+      script.onerror = (error) => {
+        console.error(`❌ Error cargando desde ${checkoutUrl}:`, error);
+        reject(new Error(`Error cargando librería de Niubiz desde ${checkoutUrl}`));
+      };
+      
+      document.head.appendChild(script);
       
       // Timeout de seguridad
       setTimeout(() => {
-        if (!window.VisanetCheckout && !window.Culqi && !window.Niubiz) {
+        if (!window.VisanetCheckout) {
           console.error('⏰ Timeout cargando librería de Niubiz');
           reject(new Error('Timeout cargando librería de Niubiz'));
         }
-      }, 15000); // 15 segundos
+      }, 10000); // 10 segundos
     });
   };
 
   // Configurar el checkout de Niubiz según documentación
   const configurarCheckoutNiubiz = (sessionData, purchaseNumber) => {
-    console.log('🔧 Configurando Niubiz Checkout...');
-    
-    window.VisanetCheckout.configure({
-      sessionkey: sessionData.sessionKey,
-      merchantid: sessionData.merchantId,
-      purchasenumber: purchaseNumber,
-      amount: sessionData.amount,
-      expirationminutes: 15,
-      
-      // Callbacks según documentación oficial
-      success: function(response) {
-        console.log('✅ Pago exitoso:', response);
-        procearPagoExitoso(response.transactionToken, purchaseNumber);
-      },
-      
-      error: function(error) {
-        console.error('❌ Error en el pago:', error);
-        setErrMsg('Error en el proceso de pago. Intenta nuevamente.');
-        setTxInfo(null);
-      },
-      
-      close: function() {
-        console.log('ℹ️ Checkout cerrado por el usuario');
-        setTxInfo(null);
-      }
+    console.log('🔧 Configurando Niubiz Checkout con datos:', {
+      sessionKey: sessionData.sessionKey,
+      merchantId: sessionData.merchantId,
+      purchaseNumber: purchaseNumber,
+      amount: sessionData.amount
     });
+    
+    try {
+      if (!window.VisanetCheckout) {
+        throw new Error('VisanetCheckout no está disponible');
+      }
 
-    // Abrir el checkout
-    window.VisanetCheckout.open();
+      if (typeof window.VisanetCheckout.configure !== 'function') {
+        throw new Error('VisanetCheckout.configure no es una función');
+      }
+
+      // Configuración según documentación oficial del Botón de Pago Web
+      window.VisanetCheckout.configure({
+        sessiontoken: sessionData.sessionKey, // Parámetro correcto
+        channel: 'web',
+        merchantid: sessionData.merchantId,
+        purchasenumber: purchaseNumber, // Solo números, ≤12 dígitos
+        amount: sessionData.amount,
+        currency: 'PEN',
+        expirationminutes: 15,
+        
+        // Callback documentado para capturar el token REAL
+        complete: function(params) {
+          console.log('✅ Checkout completado desde Niubiz:', params);
+          setCreating(false);
+          
+          // Extraer token de forma tolerante
+          const token = params?.transactionToken || params?.tokenId;
+          
+          if (!token) { 
+            console.error('❌ No se recibió token del checkout de Niubiz');
+            setErrMsg('No se recibió token de transacción del checkout. Intente nuevamente.');
+            setTxInfo(null);
+            return; 
+          }
+          
+          console.log('🔑 Token real recibido:', token);
+          // Enviar token REAL a autorización
+          procearPagoExitoso(token, purchaseNumber);
+        },
+        
+        error: function(error) {
+          console.error('❌ Error en el pago desde Niubiz:', error);
+          setErrMsg(`Error en el proceso de pago: ${error.errorMessage || error.message || 'Intenta nuevamente'}`);
+          setTxInfo(null);
+          setCreating(false);
+        },
+        
+        close: function() {
+          console.log('ℹ️ Checkout cerrado por el usuario');
+          setTxInfo(null);
+          setCreating(false);
+        }
+      });
+
+      console.log('📱 Abriendo checkout real de Niubiz...');
+      window.VisanetCheckout.open();
+      
+    } catch (error) {
+      console.error('❌ Error configurando checkout:', error);
+      setErrMsg(`Error inicializando el checkout de Niubiz: ${error.message}`);
+      setTxInfo(null);
+      setCreating(false);
+    }
   };
 
-  // Procesar pago exitoso y autorizar transacción
+  // Procesar pago exitoso y autorizar transacción con token REAL
   const procearPagoExitoso = async (transactionToken, purchaseNumber) => {
     try {
-      console.log('🔐 Autorizando transacción...');
+      console.log('🔐 Autorizando transacción con token REAL...');
+      console.log('📝 Datos de autorización:', {
+        transactionToken,
+        purchaseNumber,
+        amount: data?.ticket_price ?? 15
+      });
       
       // Autorizar la transacción según documentación
-      const authResponse = await fetch('/api/niubiz/authorize', {
+      const authResponse = await fetch('/api/niubiz/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          transactionToken,
-          purchaseNumber,
+          transactionToken, // Token REAL del checkout
+          purchaseNumber,   // Mismo purchaseNumber usado en el checkout
           amount: data?.ticket_price ?? 15
         })
       });
@@ -288,7 +295,11 @@ const FormularioRegistro = () => {
       const authData = await authResponse.json();
       console.log('✅ Respuesta de autorización:', authData);
 
-      if (authData.testMode || authData.dataMap?.ACTION_CODE === '000') {
+      // Verificar si el pago fue aprobado (código 000)
+      const action = authData?.dataMap?.ACTION_CODE || authData?.actionCode;
+      if (authData?.testMode || action === '000') {
+        console.log('🎉 Pago APROBADO con código:', action);
+        
         // Pago autorizado, crear ticket
         const save = await fetch('/api/tickets', {
           method: 'POST',
@@ -311,7 +322,8 @@ const FormularioRegistro = () => {
           setErrMsg(saved?.error || 'No se pudo registrar el ticket');
         }
       } else {
-        setErrMsg('Pago no autorizado. Intenta nuevamente.');
+        console.error('❌ Pago RECHAZADO con código:', action);
+        setErrMsg(`Pago no autorizado (código: ${action}). Intenta nuevamente.`);
         setTxInfo(null);
       }
       
@@ -367,9 +379,11 @@ const FormularioRegistro = () => {
             )}
             <br />
             <small style={{ color: '#1f1f1d', opacity: '0.8' }}>
-              {txInfo.fallbackMode 
+              {txInfo.reason === 'Credenciales de test'
+                ? 'Simulación de pago - Configurar credenciales reales para checkout verdadero'
+                : txInfo.fallbackMode 
                 ? 'Simulación por error de librería - Verificar conectividad'
-                : 'Simulación de pago - Configurar credenciales reales para producción'
+                : 'Modo de prueba activo'
               }
             </small>
           </div>
@@ -388,29 +402,29 @@ const FormularioRegistro = () => {
           <div className="pago-niubiz">
             {txInfo.testMode ? (
               <>
-                <p>🧪 <strong>SIMULACIÓN DE PAGO NIUBIZ</strong></p>
-                <p>Modo de prueba - El pago se procesará automáticamente</p>
+                <p>🧪 <strong>MODO DE PRUEBA NIUBIZ - MEJORADO</strong></p>
+                <p>Simulando proceso de pago con Niubiz Sandbox</p>
                 
                 <div className="niubiz-mock-container processing">
                   <div className="test-mode-badge">TEST</div>
                   <div className="niubiz-mock-content">
-                    <div className="icon">�</div>
+                    <div className="icon">💳</div>
                     <div className="title">Botón de Pago Web</div>
                     <div className="subtitle">Niubiz Sandbox - Incluye Yape</div>
                   </div>
                 </div>
                 
                 <div className="payment-status">
-                  <p><span className="loading-spinner"></span>Procesando pago...</p>
-                  <p className="timer">⏱️ Aprobación automática en progreso</p>
-                  <p style={{ fontSize: '12px', opacity: '0.8' }}>
-                    💡 En producción se abrirá el formulario web de Niubiz con opción Yape
+                  <p><span className="loading-spinner"></span>Procesando pago automáticamente...</p>
+                  <p className="timer">⏱️ Aprobación en 4 segundos</p>
+                  <p className="info-text">
+                    💡 En producción (HTTPS) se abrirá el formulario web real de Niubiz con Yape
                   </p>
                 </div>
               </>
             ) : (
               <div className="niubiz-processing">
-                <p>� <strong>PROCESANDO PAGO CON NIUBIZ</strong></p>
+                <p>💳 <strong>PROCESANDO PAGO CON NIUBIZ</strong></p>
                 <p>Se ha abierto el formulario de pago seguro de Niubiz</p>
                 
                 <div className="payment-status">

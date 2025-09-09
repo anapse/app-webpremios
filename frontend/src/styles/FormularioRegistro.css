@@ -504,6 +504,184 @@ button:hover {
   .pago-niubiz, .niubiz-processing {
     padding: 1.5rem;
   }
+
+  /* Spinner de carga para procesamiento */
+  .loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ff7e00;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Badge de modo test */
+  .test-mode-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #ff7e00 0%, #e06f00 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* Estados de pago */
+  .payment-status {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 126, 0, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #ff7e00;
+  }
+
+  .payment-status p {
+    margin: 5px 0;
+    color: #333;
+  }
+
+  .timer {
+    font-weight: bold;
+    color: #ff7e00;
+  }
+
+  /* Contenedor de procesamiento Niubiz */
+  .niubiz-processing {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+    margin: 20px 0;
+  }
+
+  .niubiz-processing h3 {
+    color: #28a745;
+    margin-bottom: 15px;
+  }
+
+  /* Contenedor mejorado para modo test */
+  .test-payment-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: linear-gradient(135deg, #fff8f0 0%, #fff4e6 100%);
+    border-radius: 16px;
+    border: 2px solid #ff7e00;
+    box-shadow: 0 8px 24px rgba(255, 126, 0, 0.15);
+  }
+
+  .test-payment-container h3 {
+    color: #ff7e00;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+  }
+
+  .niubiz-mock-container {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    border: 1px solid #e0e0e0;
+  }
+
+  .payment-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .niubiz-mock-container h4 {
+    color: #333;
+    margin: 0.5rem 0;
+    font-size: 1.3rem;
+  }
+
+  .amount-display {
+    background: linear-gradient(135deg, #ff7e00 0%, #e06f00 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    display: inline-block;
+  }
+
+  /* Pasos de progreso */
+  .payment-progress {
+    margin-top: 2rem;
+  }
+
+  .progress-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+
+  .step.active {
+    opacity: 1;
+  }
+
+  .step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .step.active .step-number {
+    background: #ff7e00;
+    color: white;
+  }
+
+  .step-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+  }
+
+  .step.active .step-label {
+    color: #ff7e00;
+    font-weight: bold;
+  }
+
+  .info-text {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+  }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
 }
 
 /* Responsivo */

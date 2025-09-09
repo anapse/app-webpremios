@@ -2,6 +2,12 @@ import React from 'react';
 import useFetch from '../hooks/useFetch';
 import apiRoutes from '../apiRoutes';
 
+// Helper para rutas de assets en GitHub Pages
+const getAssetPath = (asset) => {
+  const isGitHubPages = window.location.hostname === 'anapse.github.io';
+  return isGitHubPages ? `/app-webpremios/${asset}` : `/${asset}`;
+};
+
 export default function DynamicBanner() {
   const { data: bannerData, loading, error } = useFetch(apiRoutes.homeBanner);
   
@@ -10,11 +16,11 @@ export default function DynamicBanner() {
     return (
       <div className="dynamic-banner">
         <img
-          src="/placeholder-banner.svg"
+          src={getAssetPath("placeholder-banner.svg")}
           alt="Banner"
           className="sorteo-banner"
           onError={(e) => {
-            e.target.src = '/placeholder-banner.svg';
+            e.target.src = getAssetPath("placeholder-banner.svg");
           }}
         />
       </div>
@@ -22,7 +28,7 @@ export default function DynamicBanner() {
   }
 
   const { banner } = bannerData;
-  const imagenSrc = banner.imagen_base64 || banner.imagen_url || "/placeholder-banner.svg";
+  const imagenSrc = banner.imagen_base64 || banner.imagen_url || getAssetPath("placeholder-banner.svg");
 
   return (
     <div className="dynamic-banner">
@@ -32,7 +38,7 @@ export default function DynamicBanner() {
         className="sorteo-banner"
         onError={(e) => {
           // Si falla la carga, usar placeholder
-          e.target.src = '/placeholder-banner.svg';
+          e.target.src = getAssetPath("placeholder-banner.svg");
         }}
       />
     </div>

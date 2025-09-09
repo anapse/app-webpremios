@@ -36,6 +36,11 @@ const apiRoutes = {
 
     // Pagos
     niubizPayment: `${API_BASE_URL}/niubiz/payment`,
+    niubizSession: `${API_BASE_URL}/niubiz/session`,
+    niubizConfirm: `${API_BASE_URL}/niubiz/confirm`,
+
+    // Configuración
+    config: `${API_BASE_URL}/config`,
 
     // Otros
     libroReclamaciones: `${API_BASE_URL}/libro-reclamaciones`,

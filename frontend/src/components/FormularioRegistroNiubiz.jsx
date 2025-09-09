@@ -47,11 +47,11 @@ const FormularioRegistro = () => {
 
     try {
       setCreating(true);
-      console.log('[API] POST /api/niubiz/session - Botón de Pago Web');
+      console.log('[API] POST niubiz/session - Botón de Pago Web');
       
       // Crear sesión de pago según documentación oficial
       // Llamar al endpoint correcto
-      const res = await fetch('/api/niubiz/session', {
+      const res = await fetch(apiRoutes.niubizSession, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -282,7 +282,7 @@ const FormularioRegistro = () => {
       });
       
       // Autorizar la transacción según documentación
-      const authResponse = await fetch('/api/niubiz/confirm', {
+      const authResponse = await fetch(apiRoutes.niubizConfirm, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -301,7 +301,7 @@ const FormularioRegistro = () => {
         console.log('🎉 Pago APROBADO con código:', action);
         
         // Pago autorizado, crear ticket
-        const save = await fetch('/api/tickets', {
+        const save = await fetch(apiRoutes.tickets, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

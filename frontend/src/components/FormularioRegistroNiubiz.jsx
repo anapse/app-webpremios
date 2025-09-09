@@ -177,7 +177,7 @@ const FormularioRegistro = () => {
         }
 
         const currentUrl = urlsToTry[attemptIndex];
-        console.log(`📦 Intentando cargar desde: ${currentUrl} (intento ${attemptIndex + 1}/${urlsToTry.length})`);
+        console.log(`📦 [v2] Intentando cargar desde: ${currentUrl} (intento ${attemptIndex + 1}/${urlsToTry.length})`);
 
         const script = document.createElement('script');
         script.src = currentUrl;

@@ -5,8 +5,8 @@ const isLocalDev = window.location.hostname === 'localhost' || window.location.h
 let API_BASE_URL;
 
 if (isGitHubPages) {
-    // En GitHub Pages, usar la URL de producción sin HTTPS
-    API_BASE_URL = 'http://77.237.239.180:3000/api';
+    // En GitHub Pages, usar el dominio con HTTPS
+    API_BASE_URL = 'https://gameztorepremios.com/api';
 } else if (isLocalDev) {
     // En desarrollo local, usar rutas relativas con proxy
     API_BASE_URL = import.meta.env.VITE_API_BASE || '/api';

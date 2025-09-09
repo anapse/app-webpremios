@@ -113,7 +113,9 @@ const FormularioRegistro = () => {
         
         // Cargar librería de Niubiz y configurar checkout
         try {
-          await cargarLibreriaNiubiz(r.checkoutUrl);
+          await cargarLibreriaNiubiz();
+          
+          // Generar purchaseNumber solo números, ≤12 dígitos
           const purchaseNumber = Date.now().toString().slice(-10);
           
           setTxInfo({ 
@@ -143,9 +145,10 @@ const FormularioRegistro = () => {
   };
 
   // Cargar librería de Niubiz dinámicamente
-  const cargarLibreriaNiubiz = (checkoutUrl) => {
+  const cargarLibreriaNiubiz = () => {
     return new Promise((resolve, reject) => {
-      console.log('📦 Cargando librería oficial de Niubiz:', checkoutUrl);
+      const SCRIPT_URL = 'https://static-content-qas.vnforapps.com/env/sandbox/js/checkout.js';
+      console.log('📦 Cargando script oficial de Niubiz:', SCRIPT_URL);
       
       // Verificar si ya está cargado
       if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
@@ -161,58 +164,32 @@ const FormularioRegistro = () => {
         console.log('🧹 Script anterior eliminado:', script.src);
       });
 
-      // Lista de URLs a intentar (para evitar CORS en GitHub Pages)
-      const urlsToTry = [
-        'https://static-content.vnforapps.com/v2/js/checkout.js', // URL de producción (menos restrictiva) - PRIMERO
-        checkoutUrl, // URL oficial del backend  
-        'https://cors-anywhere.herokuapp.com/' + checkoutUrl // Proxy CORS como backup
-      ];
-
-      let attemptIndex = 0;
-
-      const tryLoadScript = () => {
-        if (attemptIndex >= urlsToTry.length) {
-          reject(new Error('No se pudo cargar la librería de Niubiz desde ninguna URL'));
-          return;
-        }
-
-        const currentUrl = urlsToTry[attemptIndex];
-        console.log(`📦 [v2] Intentando cargar desde: ${currentUrl} (intento ${attemptIndex + 1}/${urlsToTry.length})`);
-
-        const script = document.createElement('script');
-        script.src = currentUrl;
-        script.async = true;
-        // No usar crossOrigin para evitar problemas CORS
+      const script = document.createElement('script');
+      script.src = SCRIPT_URL;
+      script.async = true;
+      // No usar crossOrigin, type="module", ni import() - inyección clásica
+      
+      script.onload = () => {
+        console.log(`✅ Script cargado desde: ${SCRIPT_URL}`);
         
-        script.onload = () => {
-          console.log(`✅ Script cargado desde: ${currentUrl}`);
-          
-          // Verificar que VisanetCheckout esté disponible
-          setTimeout(() => {
-            if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
-              console.log('✅ VisanetCheckout.configure disponible');
-              resolve();
-            } else {
-              console.error('❌ VisanetCheckout no disponible después de la carga');
-              attemptIndex++;
-              script.remove();
-              tryLoadScript(); // Intentar siguiente URL
-            }
-          }, 1000);
-        };
-        
-        script.onerror = (error) => {
-          console.error(`❌ Error cargando desde ${currentUrl}:`, error);
-          attemptIndex++;
-          script.remove();
-          tryLoadScript(); // Intentar siguiente URL
-        };
-        
-        document.head.appendChild(script);
+        // Verificar que VisanetCheckout esté disponible
+        setTimeout(() => {
+          if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
+            console.log('✅ window.VisanetCheckout disponible');
+            resolve();
+          } else {
+            console.error('❌ window.VisanetCheckout no disponible después de la carga');
+            reject(new Error('VisanetCheckout no disponible después de cargar la librería'));
+          }
+        }, 1000);
       };
-
-      // Empezar intentos
-      tryLoadScript();
+      
+      script.onerror = (error) => {
+        console.error(`❌ Error cargando desde ${SCRIPT_URL}:`, error);
+        reject(new Error(`Error cargando librería de Niubiz desde ${SCRIPT_URL}`));
+      };
+      
+      document.head.appendChild(script);
       
       // Timeout de seguridad
       setTimeout(() => {
@@ -220,18 +197,13 @@ const FormularioRegistro = () => {
           console.error('⏰ Timeout cargando librería de Niubiz');
           reject(new Error('Timeout cargando librería de Niubiz'));
         }
-      }, 15000); // 15 segundos para múltiples intentos
+      }, 10000);
     });
   };
 
   // Configurar el checkout de Niubiz según documentación
   const configurarCheckoutNiubiz = (sessionData, purchaseNumber) => {
-    console.log('🔧 Configurando Niubiz Checkout con datos:', {
-      sessionKey: sessionData.sessionKey,
-      merchantId: sessionData.merchantId,
-      purchaseNumber: purchaseNumber,
-      amount: sessionData.amount
-    });
+    console.log('🔧 Configurando Niubiz Checkout...');
     
     try {
       if (!window.VisanetCheckout) {
@@ -242,15 +214,41 @@ const FormularioRegistro = () => {
         throw new Error('VisanetCheckout.configure no es una función');
       }
 
+      // Validar que TODOS los parámetros obligatorios estén presentes
+      const params = {
+        action: 'pay', // OBLIGATORIO
+        merchantid: sessionData.merchantId, // OBLIGATORIO 
+        sessiontoken: sessionData.sessionKey, // OBLIGATORIO
+        purchasenumber: purchaseNumber, // OBLIGATORIO - Solo números, ≤12 dígitos
+        amount: sessionData.amount, // OBLIGATORIO
+        currency: 'PEN', // Recomendado
+        channel: 'web', // Recomendado
+        expirationminutes: 15 // Recomendado
+      };
+
+      // Logs de validación previos a configure()
+      console.log('📋 Validando parámetros obligatorios:');
+      console.log('  action:', params.action, '(obligatorio)');
+      console.log('  merchantid:', params.merchantid, '(obligatorio)');
+      console.log('  sessiontoken:', params.sessiontoken ? `${params.sessiontoken.substring(0, 10)}...` : 'MISSING', '(obligatorio)');
+      console.log('  purchasenumber:', params.purchasenumber, '(obligatorio)');
+      console.log('  amount:', params.amount, '(obligatorio)');
+      console.log('  currency:', params.currency);
+      console.log('  channel:', params.channel);
+
+      // Verificar que ningún valor obligatorio esté undefined o vacío
+      const requiredParams = ['action', 'merchantid', 'sessiontoken', 'purchasenumber', 'amount'];
+      for (const param of requiredParams) {
+        if (!params[param] || params[param] === undefined || params[param] === '') {
+          throw new Error(`Parámetro obligatorio faltante o vacío: ${param}`);
+        }
+      }
+
+      console.log('✅ Todos los parámetros obligatorios están presentes');
+
       // Configuración según documentación oficial del Botón de Pago Web
       window.VisanetCheckout.configure({
-        sessiontoken: sessionData.sessionKey, // Parámetro correcto
-        channel: 'web',
-        merchantid: sessionData.merchantId,
-        purchasenumber: purchaseNumber, // Solo números, ≤12 dígitos
-        amount: sessionData.amount,
-        currency: 'PEN',
-        expirationminutes: 15,
+        ...params,
         
         // Callback documentado para capturar el token REAL
         complete: function(params) {
@@ -268,7 +266,7 @@ const FormularioRegistro = () => {
           }
           
           console.log('🔑 Token real recibido:', token);
-          // Enviar token REAL a autorización
+          // Enviar token REAL a autorización con el MISMO purchaseNumber
           procearPagoExitoso(token, purchaseNumber);
         },
         
@@ -312,9 +310,10 @@ const FormularioRegistro = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          transactionToken, // Token REAL del checkout
+          tokenId: transactionToken, // Token REAL del checkout como tokenId
           purchaseNumber,   // Mismo purchaseNumber usado en el checkout
-          amount: data?.ticket_price ?? 15
+          amount: data?.ticket_price ?? 15,
+          currency: 'PEN'
         })
       });
 

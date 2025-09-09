@@ -220,23 +220,37 @@ const FormularioRegistro = () => {
         merchantid: sessionData.merchantId, // OBLIGATORIO 
         sessiontoken: sessionData.sessionKey, // OBLIGATORIO
         purchasenumber: purchaseNumber, // OBLIGATORIO - Solo números, ≤12 dígitos
-        amount: sessionData.amount, // OBLIGATORIO
+        amount: parseFloat(sessionData.amount), // OBLIGATORIO - Asegurar que sea número
         currency: 'PEN', // Recomendado
         channel: 'web', // Recomendado
         expirationminutes: 15, // Recomendado
         timeouturl: 'https://anapse.github.io/app-webpremios/#/niubiz' // OBLIGATORIO - URL pública HTTPS
       };
 
+      // Validaciones adicionales de formato
+      if (!/^\d+$/.test(purchaseNumber)) {
+        throw new Error('purchaseNumber debe contener solo números');
+      }
+      
+      if (purchaseNumber.length > 12) {
+        throw new Error('purchaseNumber no puede tener más de 12 dígitos');
+      }
+      
+      if (isNaN(params.amount) || params.amount <= 0) {
+        throw new Error('amount debe ser un número positivo');
+      }
+
       // Logs de validación previos a configure()
       console.log('📋 Validando parámetros obligatorios:');
       console.log('  action:', params.action, '(obligatorio)');
       console.log('  merchantid:', params.merchantid, '(obligatorio)');
       console.log('  sessiontoken:', params.sessiontoken ? `${params.sessiontoken.substring(0, 10)}...` : 'MISSING', '(obligatorio)');
-      console.log('  purchasenumber:', params.purchasenumber, '(obligatorio)');
-      console.log('  amount:', params.amount, '(obligatorio)');
+      console.log('  purchasenumber:', params.purchasenumber, `(obligatorio, longitud: ${params.purchasenumber.length})`);
+      console.log('  amount:', params.amount, `(obligatorio, tipo: ${typeof params.amount})`);
       console.log('  timeouturl:', params.timeouturl, '(obligatorio)');
       console.log('  currency:', params.currency);
       console.log('  channel:', params.channel);
+      console.log('  expirationminutes:', params.expirationminutes);
 
       // Verificar que ningún valor obligatorio esté undefined o vacío
       const requiredParams = ['action', 'merchantid', 'sessiontoken', 'purchasenumber', 'amount', 'timeouturl'];
@@ -286,8 +300,20 @@ const FormularioRegistro = () => {
         }
       });
 
+      console.log('✅ VisanetCheckout.configure() ejecutado exitosamente');
       console.log('📱 Abriendo checkout real de Niubiz...');
-      window.VisanetCheckout.open();
+      
+      // Pequeña pausa para asegurar que configure() se complete
+      setTimeout(() => {
+        try {
+          window.VisanetCheckout.open();
+          console.log('✅ VisanetCheckout.open() ejecutado');
+        } catch (openError) {
+          console.error('❌ Error al abrir checkout:', openError);
+          setErrMsg(`Error al abrir el checkout: ${openError.message}`);
+          setCreating(false);
+        }
+      }, 100);
       
     } catch (error) {
       console.error('❌ Error configurando checkout:', error);

@@ -1,1 +1,0 @@
-import{j as o}from"./index-BtgZLOfT.js";import"./vendor-DJKrsZSW.js";const a=({titulo:t,sorteo:e})=>{if(!e)return o.jsx("p",{children:"Cargando..."});const n=e.sorteo_date?new Date(e.sorteo_date).toLocaleDateString("es-PE",{day:"numeric",month:"long",timeZone:"UTC"}):"Fecha no disponible";return o.jsx("div",{children:o.jsxs("h2",{children:[t," ",n]})})};export{a as S};

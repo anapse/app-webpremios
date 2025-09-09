@@ -162,6 +162,10 @@ const FormularioRegistro = () => {
       setCreating(true);
       console.log('[API] POST niubiz/session - Botón de Pago Web');
       
+      // Obtener IP real antes de crear sesión
+      const ipUsuario = await obtenerIPUsuario();
+      console.log('🌐 Enviando IP real a Niubiz:', ipUsuario);
+      
       // Crear sesión de pago según documentación oficial
       // Llamar al endpoint correcto
       const res = await fetch(apiRoutes.niubizSession, {
@@ -170,6 +174,7 @@ const FormularioRegistro = () => {
         body: JSON.stringify({
           amount: data?.ticket_price ?? 15,
           currency: 'PEN',
+          clientIp: ipUsuario, // Enviar IP real obtenida dinámicamente
           customer: { 
             dni: formData.dni,
             email: `${formData.dni}@gameztore.com`, 

@@ -120,12 +120,16 @@ exports.createSession = async (req, res) => {
         console.log('🔑 Obteniendo token de acceso...');
         const accessToken = await getAccessToken();
 
+        // Log para verificar IP recibida
+        console.log('🌐 IP recibida del frontend:', req.body.clientIp);
+        console.log('🌐 IP del servidor (req.ip):', req.ip);
+
         // Payload según documentación oficial del Botón de Pago Web
         const payload = {
             channel: "web",
             amount: parseFloat(amount),
             antifraud: {
-                clientIp: req.ip,
+                clientIp: req.body.clientIp || req.ip,
                 merchantDefineData: {
                     MDD4: customer.email || `${customer.dni}@gameztore.com`,
                     MDD32: customer.email || `${customer.dni}@gameztore.com`,

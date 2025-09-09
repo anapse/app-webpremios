@@ -323,6 +323,9 @@ const FormularioRegistro = () => {
   const configurarCheckoutNiubiz = (sessionData, purchaseNumber) => {
     console.log('🔧 Configurando Niubiz Checkout...');
     
+    // Variable para manejar timeout de seguridad
+    let securityTimeoutId = null;
+    
     try {
       if (!window.VisanetCheckout) {
         throw new Error('VisanetCheckout no está disponible');
@@ -406,6 +409,7 @@ const FormularioRegistro = () => {
         
         error: function(error) {
           console.error('❌ Error en el pago desde Niubiz:', error);
+          if (securityTimeoutId) clearTimeout(securityTimeoutId);
           
           // Guardar datos de denuncia automáticamente
           guardarDenuncia(error).then(resultado => {
@@ -421,13 +425,21 @@ const FormularioRegistro = () => {
         
         close: function() {
           console.log('ℹ️ Checkout cerrado por el usuario');
+          if (securityTimeoutId) clearTimeout(securityTimeoutId);
           setTxInfo(null);
           setCreating(false);
+          setErrMsg(''); // Limpiar errores al cerrar
         }
       });
 
       console.log('✅ VisanetCheckout.configure() ejecutado exitosamente');
       console.log('📱 Abriendo checkout real de Niubiz...');
+      
+      // Timeout de seguridad para resetear estado si algo sale mal
+      securityTimeoutId = setTimeout(() => {
+        console.log('⏰ Timeout de seguridad: reseteando estado creating');
+        setCreating(false);
+      }, 30000); // 30 segundos
       
       // Pequeña pausa para asegurar que configure() se complete
       setTimeout(() => {
@@ -438,6 +450,7 @@ const FormularioRegistro = () => {
           console.error('❌ Error al abrir checkout:', openError);
           setErrMsg(`Error al abrir el checkout: ${openError.message}`);
           setCreating(false);
+          if (securityTimeoutId) clearTimeout(securityTimeoutId);
         }
       }, 100);
       

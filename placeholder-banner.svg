@@ -1,0 +1,51 @@
+<!-- Banner placeholder SVG para cuando no hay imagen de banner -->
+<svg width="1200" height="400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+  <defs>
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="50%" stop-color="#2a2a2a"/>
+      <stop offset="100%" stop-color="#1f1f1d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff7e00"/>
+      <stop offset="100%" stop-color="#e06f00"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo principal -->
+  <rect width="1200" height="400" fill="url(#bannerBg)"/>
+  
+  <!-- Patrón decorativo -->
+  <circle cx="150" cy="100" r="60" fill="#ff7e00" opacity="0.1"/>
+  <circle cx="1050" cy="300" r="80" fill="#ff7e00" opacity="0.1"/>
+  <circle cx="950" cy="80" r="40" fill="#e06f00" opacity="0.15"/>
+  
+  <!-- Líneas decorativas -->
+  <rect x="0" y="0" width="1200" height="5" fill="url(#accent)"/>
+  <rect x="0" y="395" width="1200" height="5" fill="url(#accent)"/>
+  
+  <!-- Elemento central -->
+  <g transform="translate(600, 200)">
+    <!-- Círculo central -->
+    <circle cx="0" cy="0" r="80" fill="none" stroke="#ff7e00" stroke-width="3" opacity="0.7"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#ff7e00" stroke-width="2" opacity="0.5"/>
+    
+    <!-- Icono de estrella/premio -->
+    <polygon points="0,-25 7.5,-7.5 25,0 7.5,7.5 0,25 -7.5,7.5 -25,0 -7.5,-7.5" 
+             fill="#ff7e00" opacity="0.8"/>
+  </g>
+  
+  <!-- Área para texto (semi-transparente) -->
+  <rect x="200" y="150" width="800" height="100" fill="#000000" opacity="0.3" rx="10"/>
+  
+  <!-- Texto placeholder -->
+  <text x="600" y="190" text-anchor="middle" fill="#ffffff" font-family="Montserrat, sans-serif" 
+        font-size="32" font-weight="700">
+    Banner Principal
+  </text>
+  
+  <text x="600" y="220" text-anchor="middle" fill="#cccccc" font-family="Montserrat, sans-serif" 
+        font-size="18" font-weight="400">
+    Configura tu imagen de banner desde el Dashboard
+  </text>
+</svg>

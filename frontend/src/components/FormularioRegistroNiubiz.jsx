@@ -163,9 +163,9 @@ const FormularioRegistro = () => {
 
       // Lista de URLs a intentar (para evitar CORS en GitHub Pages)
       const urlsToTry = [
-        checkoutUrl, // URL oficial del backend
-        'https://cors-anywhere.herokuapp.com/' + checkoutUrl, // Proxy CORS como backup
-        'https://static-content.vnforapps.com/v2/js/checkout.js' // URL de producción (menos restrictiva)
+        'https://static-content.vnforapps.com/v2/js/checkout.js', // URL de producción (menos restrictiva) - PRIMERO
+        checkoutUrl, // URL oficial del backend  
+        'https://cors-anywhere.herokuapp.com/' + checkoutUrl // Proxy CORS como backup
       ];
 
       let attemptIndex = 0;

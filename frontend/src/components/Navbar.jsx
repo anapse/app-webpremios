@@ -136,7 +136,9 @@ function Navbar() {
         <div className={`navbar-links ${menuOpen ? 'active' : ''}`}>
           <Link to="/" onClick={handleLinkClick}>Home</Link>
           <Link to="/tickets" onClick={handleLinkClick}>Tickets</Link>
-          <Link to="/niubiz" onClick={handleLinkClick} className="niubiz-btn">Niubiz</Link>
+          {isLoggedIn && (
+            <Link to="/niubiz" onClick={handleLinkClick} className="niubiz-btn">Niubiz</Link>
+          )}
           <Link to="/ganadores" onClick={handleLinkClick}>Ganadores</Link>
           
           {isLoggedIn ? (

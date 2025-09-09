@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'production' ? '/app-webpremios/' : '/',
+  // Base para GitHub Pages vs VPS
+  base: process.env.VITE_BUILD_TARGET === 'vps' ? '/' : '/app-webpremios/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

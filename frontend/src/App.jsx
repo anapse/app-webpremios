@@ -31,7 +31,14 @@ function App() {
             <Route path="/tickets" element={<Tickets />} />
             <Route path="/ganadores" element={<Winners />} />
             <Route path="/registro" element={<RegistroPage />} />
-            <Route path="/niubiz" element={<RegistroNiubizPage />} />
+            <Route 
+              path="/niubiz" 
+              element={
+                <ProtectedRoute>
+                  <RegistroNiubizPage />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/libro-reclamaciones" element={<LibroReclamaciones/>} />
             <Route path="/terminos" element={<Terminos />} />
             <Route 

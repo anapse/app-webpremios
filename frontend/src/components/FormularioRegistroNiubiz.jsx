@@ -223,7 +223,8 @@ const FormularioRegistro = () => {
         amount: sessionData.amount, // OBLIGATORIO
         currency: 'PEN', // Recomendado
         channel: 'web', // Recomendado
-        expirationminutes: 15 // Recomendado
+        expirationminutes: 15, // Recomendado
+        timeouturl: 'https://anapse.github.io/app-webpremios/#/niubiz' // OBLIGATORIO - URL pública HTTPS
       };
 
       // Logs de validación previos a configure()
@@ -233,11 +234,12 @@ const FormularioRegistro = () => {
       console.log('  sessiontoken:', params.sessiontoken ? `${params.sessiontoken.substring(0, 10)}...` : 'MISSING', '(obligatorio)');
       console.log('  purchasenumber:', params.purchasenumber, '(obligatorio)');
       console.log('  amount:', params.amount, '(obligatorio)');
+      console.log('  timeouturl:', params.timeouturl, '(obligatorio)');
       console.log('  currency:', params.currency);
       console.log('  channel:', params.channel);
 
       // Verificar que ningún valor obligatorio esté undefined o vacío
-      const requiredParams = ['action', 'merchantid', 'sessiontoken', 'purchasenumber', 'amount'];
+      const requiredParams = ['action', 'merchantid', 'sessiontoken', 'purchasenumber', 'amount', 'timeouturl'];
       for (const param of requiredParams) {
         if (!params[param] || params[param] === undefined || params[param] === '') {
           throw new Error(`Parámetro obligatorio faltante o vacío: ${param}`);

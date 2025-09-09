@@ -161,32 +161,58 @@ const FormularioRegistro = () => {
         console.log('🧹 Script anterior eliminado:', script.src);
       });
 
-      const script = document.createElement('script');
-      script.src = checkoutUrl; // Usar solo la URL oficial del backend
-      script.async = true;
-      script.crossOrigin = 'anonymous';
-      
-      script.onload = () => {
-        console.log(`✅ Script cargado desde: ${checkoutUrl}`);
+      // Lista de URLs a intentar (para evitar CORS en GitHub Pages)
+      const urlsToTry = [
+        checkoutUrl, // URL oficial del backend
+        'https://cors-anywhere.herokuapp.com/' + checkoutUrl, // Proxy CORS como backup
+        'https://static-content.vnforapps.com/v2/js/checkout.js' // URL de producción (menos restrictiva)
+      ];
+
+      let attemptIndex = 0;
+
+      const tryLoadScript = () => {
+        if (attemptIndex >= urlsToTry.length) {
+          reject(new Error('No se pudo cargar la librería de Niubiz desde ninguna URL'));
+          return;
+        }
+
+        const currentUrl = urlsToTry[attemptIndex];
+        console.log(`📦 Intentando cargar desde: ${currentUrl} (intento ${attemptIndex + 1}/${urlsToTry.length})`);
+
+        const script = document.createElement('script');
+        script.src = currentUrl;
+        script.async = true;
+        // No usar crossOrigin para evitar problemas CORS
         
-        // Verificar que VisanetCheckout esté disponible
-        setTimeout(() => {
-          if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
-            console.log('✅ VisanetCheckout.configure disponible');
-            resolve();
-          } else {
-            console.error('❌ VisanetCheckout no disponible después de la carga');
-            reject(new Error('VisanetCheckout no disponible después de cargar la librería'));
-          }
-        }, 1000); // Dar más tiempo para la inicialización
+        script.onload = () => {
+          console.log(`✅ Script cargado desde: ${currentUrl}`);
+          
+          // Verificar que VisanetCheckout esté disponible
+          setTimeout(() => {
+            if (window.VisanetCheckout && typeof window.VisanetCheckout.configure === 'function') {
+              console.log('✅ VisanetCheckout.configure disponible');
+              resolve();
+            } else {
+              console.error('❌ VisanetCheckout no disponible después de la carga');
+              attemptIndex++;
+              script.remove();
+              tryLoadScript(); // Intentar siguiente URL
+            }
+          }, 1000);
+        };
+        
+        script.onerror = (error) => {
+          console.error(`❌ Error cargando desde ${currentUrl}:`, error);
+          attemptIndex++;
+          script.remove();
+          tryLoadScript(); // Intentar siguiente URL
+        };
+        
+        document.head.appendChild(script);
       };
-      
-      script.onerror = (error) => {
-        console.error(`❌ Error cargando desde ${checkoutUrl}:`, error);
-        reject(new Error(`Error cargando librería de Niubiz desde ${checkoutUrl}`));
-      };
-      
-      document.head.appendChild(script);
+
+      // Empezar intentos
+      tryLoadScript();
       
       // Timeout de seguridad
       setTimeout(() => {
@@ -194,7 +220,7 @@ const FormularioRegistro = () => {
           console.error('⏰ Timeout cargando librería de Niubiz');
           reject(new Error('Timeout cargando librería de Niubiz'));
         }
-      }, 10000); // 10 segundos
+      }, 15000); // 15 segundos para múltiples intentos
     });
   };
 

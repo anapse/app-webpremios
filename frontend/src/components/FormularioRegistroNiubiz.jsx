@@ -13,6 +13,14 @@ const FormularioRegistro = () => {
     dni: '', nombres: '', apellidos: '', telefono: '', departamento: '', mayorEdad: false
   });
 
+  // Estado para datos de denuncia
+  const [denunciaData, setDenunciaData] = useState({
+    numeroPedido: '',
+    fechaHoraPedido: '',
+    descripcionDenegacion: '',
+    ipUsuario: ''
+  });
+
   const [ticketCode, setTicketCode] = useState(null);
   const [txInfo, setTxInfo] = useState(null);
 
@@ -34,9 +42,114 @@ const FormularioRegistro = () => {
     return () => clearInterval(t);
   }, [data]);
 
+  // Obtener IP del usuario al cargar el componente
+  useEffect(() => {
+    obtenerIPUsuario();
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  // Función para manejar cambios en el formulario de denuncia
+  const handleDenunciaChange = (e) => {
+    const { name, value } = e.target;
+    setDenunciaData(p => ({ ...p, [name]: value }));
+  };
+
+  // Función para guardar datos de denuncia
+  const guardarDenuncia = async (errorInfo) => {
+    try {
+      // Obtener IP antes de guardar
+      const ip = await obtenerIPUsuario();
+      
+      // Preparar datos de denuncia
+      const datosDenuncia = {
+        ...denunciaData,
+        numeroPedido: txInfo?.purchaseNumber || 'NO_DISPONIBLE',
+        fechaHoraPedido: new Date().toISOString(),
+        descripcionDenegacion: errorInfo.errorMessage || errorInfo.message || 'Error en proceso de pago',
+        ipUsuario: ip,
+        // Datos adicionales del usuario
+        usuarioDni: formData.dni,
+        usuarioNombres: formData.nombres,
+        usuarioApellidos: formData.apellidos,
+        usuarioTelefono: formData.telefono,
+        // Información técnica del error
+        sessionKey: txInfo?.sessionKey?.substring(0, 10) + '...' || 'NO_DISPONIBLE',
+        merchantId: txInfo?.merchantId || 'NO_DISPONIBLE',
+        amount: txInfo?.amount || 'NO_DISPONIBLE',
+        errorCode: errorInfo.errorCode || 'UNKNOWN',
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent
+      };
+
+      console.log('💾 Guardando datos de denuncia:', datosDenuncia);
+
+      // Enviar al backend para guardar en base de datos
+      const response = await fetch(apiRoutes.libroReclamaciones, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'DENUNCIA_PAGO',
+          datos: datosDenuncia,
+          estado: 'PENDIENTE'
+        })
+      });
+
+      if (response.ok) {
+        const resultado = await response.json();
+        console.log('✅ Denuncia guardada exitosamente:', resultado);
+        return resultado;
+      } else {
+        console.error('❌ Error guardando denuncia:', response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error en guardarDenuncia:', error);
+      return null;
+    }
+  };
+
+  // Función para obtener la IP dinámica del usuario
+  const obtenerIPUsuario = async () => {
+    try {
+      // Intentar múltiples servicios para obtener la IP
+      const servicios = [
+        'https://api.ipify.org?format=json',
+        'https://ipapi.co/json/',
+        'https://httpbin.org/ip'
+      ];
+
+      for (const servicio of servicios) {
+        try {
+          const response = await fetch(servicio);
+          const data = await response.json();
+          
+          // Extraer IP según el formato de respuesta de cada servicio
+          const ip = data.ip || data.origin || data.query;
+          if (ip) {
+            console.log('🌐 IP obtenida:', ip);
+            setDenunciaData(prev => ({ ...prev, ipUsuario: ip }));
+            return ip;
+          }
+        } catch (error) {
+          console.warn(`⚠️ Error obteniendo IP de ${servicio}:`, error);
+          continue;
+        }
+      }
+      
+      // Si no se pudo obtener, usar una IP local como fallback
+      console.warn('⚠️ No se pudo obtener IP externa, usando fallback');
+      const fallbackIP = 'IP_NO_DISPONIBLE';
+      setDenunciaData(prev => ({ ...prev, ipUsuario: fallbackIP }));
+      return fallbackIP;
+    } catch (error) {
+      console.error('❌ Error general obteniendo IP:', error);
+      setDenunciaData(prev => ({ ...prev, ipUsuario: 'ERROR_IP' }));
+      return 'ERROR_IP';
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -288,6 +401,14 @@ const FormularioRegistro = () => {
         
         error: function(error) {
           console.error('❌ Error en el pago desde Niubiz:', error);
+          
+          // Guardar datos de denuncia automáticamente
+          guardarDenuncia(error).then(resultado => {
+            if (resultado) {
+              console.log('📋 Denuncia registrada automáticamente por error de pago');
+            }
+          });
+          
           setErrMsg(`Error en el proceso de pago: ${error.errorMessage || error.message || 'Intenta nuevamente'}`);
           setTxInfo(null);
           setCreating(false);
@@ -376,6 +497,20 @@ const FormularioRegistro = () => {
         }
       } else {
         console.error('❌ Pago RECHAZADO con código:', action);
+        
+        // Guardar denuncia por pago rechazado
+        const errorInfo = {
+          errorCode: action,
+          message: `Pago rechazado con código: ${action}`,
+          errorMessage: `La transacción fue rechazada por el sistema de pagos (ACTION_CODE: ${action})`
+        };
+        
+        guardarDenuncia(errorInfo).then(resultado => {
+          if (resultado) {
+            console.log('📋 Denuncia registrada por pago rechazado');
+          }
+        });
+        
         setErrMsg(`Pago no autorizado (código: ${action}). Intenta nuevamente.`);
         setTxInfo(null);
       }

@@ -35,7 +35,7 @@ function validateActionCode(actionCode, status) {
     const successCodes = ['000', '010']; // Códigos de autorización exitosa
     const isAuthorized = status === 'Authorized';
     const isSuccessCode = successCodes.includes(actionCode);
-    
+
     return {
         isSuccess: isAuthorized && isSuccessCode,
         isAuthorized: isAuthorized,
@@ -48,6 +48,12 @@ async function getAccessToken() {
     if (!NIUBIZ_USER || !NIUBIZ_PASS) {
         throw new Error('Credenciales Niubiz no configuradas correctamente');
     }
+
+    console.log('🔑 Intentando obtener token con:', {
+        user: NIUBIZ_USER,
+        passLength: NIUBIZ_PASS ? NIUBIZ_PASS.length : 0,
+        base: NIUBIZ_BASE
+    });
 
     const credentials = `${NIUBIZ_USER}:${NIUBIZ_PASS}`;
     const basic = Buffer.from(credentials).toString('base64');
@@ -62,9 +68,15 @@ async function getAccessToken() {
             timeout: 10000,
         });
 
-        return response.data;
+        console.log('✅ Token obtenido exitosamente');
+        // ✅ CORRECCIÓN CRÍTICA: Retornar Bearer + token
+        return `Bearer ${response.data}`;
     } catch (error) {
-        console.error('❌ Error obteniendo token:', error.response?.status, error.message);
+        console.error('❌ Error obteniendo token:', {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message
+        });
         throw error;
     }
 }
@@ -247,9 +259,9 @@ exports.authorizeTransaction = async (req, res) => {
         const status = data.dataMap?.STATUS;
         const actionCode = data.dataMap?.ACTION_CODE;
         const validation = validateActionCode(actionCode, status);
-        
+
         console.log(`✅ Respuesta autorización - STATUS: ${status}, ACTION_CODE: ${actionCode}`);
-        
+
         // Agregar información de validación a la respuesta
         const response = {
             ...data,
@@ -277,7 +289,7 @@ exports.authorizeTransaction = async (req, res) => {
         // Determinar si es un error de CVV2 u otro específico
         const isSuccessCode = ['000', '010'].includes(actionCode);
         const isCvvError = actionDescription?.toLowerCase().includes('cvv');
-        
+
         return res.status(400).json({
             error: 'Error autorizando transacción',
             actionCode: actionCode,

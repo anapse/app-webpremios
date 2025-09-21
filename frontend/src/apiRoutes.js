@@ -47,5 +47,6 @@ const apiRoutes = {
 };
 
 export default apiRoutes;
+export { API_BASE_URL };
 
 

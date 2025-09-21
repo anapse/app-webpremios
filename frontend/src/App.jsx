@@ -1,5 +1,5 @@
 // App.jsx
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense,React } from 'react'
 import Navbar from './components/Navbar'
 import LibroReclamaciones from './pages/LibroReclamaciones'
@@ -10,6 +10,7 @@ import { LoadingProvider } from './context/LoadingContext'
 import PageLoader from './components/PageLoader'
 import ProtectedRoute from './components/ProtectedRoute'
 
+
 // Lazy loading de páginas
 const Home = lazy(() => import('./pages/Home'))
 const Tickets = lazy(() => import('./pages/Tickets'))
@@ -18,6 +19,8 @@ const RegistroPage = lazy(() => import('./pages/RegistroPage'))
 const RegistroNiubizPage = lazy(() => import('./pages/RegistroNiubizPage'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Terminos = lazy(() => import('./pages/Terminos'));
+const Niubizpay = lazy(() => import('./pages/Niubizpay'));
+const PaymentResult = lazy(() => import('./components/PaymentResult'));
 
 function App() {
   return (
@@ -41,6 +44,8 @@ function App() {
             />
             <Route path="/libro-reclamaciones" element={<LibroReclamaciones/>} />
             <Route path="/terminos" element={<Terminos />} />
+            <Route path="/pay" element={<Niubizpay />} />
+            <Route path="/payment-result" element={<PaymentResult />} />
             <Route 
               path="/dashboard" 
               element={

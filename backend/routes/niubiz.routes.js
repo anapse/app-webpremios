@@ -42,17 +42,21 @@ router.post('/session/create', (req, res) => {
         return niubizController.createSession(req, res);
     }
 
-    // Modo de prueba con sesión simulada
+    // Modo de prueba con sesión simulada - URLs de producción para testing
     const purchaseNumber = Date.now().toString().slice(-10);
+    const expirationTimestamp = Date.now() + 900000; // Simular expiración en 15 minutos
+
     return res.json({
         sessionKey: `sess_test_${purchaseNumber}`,
-        expirationTime: 900000, // 15 minutos
+        expirationTime: expirationTimestamp, // ENVIAR TIMESTAMP EXACTO
         merchantId: 'TEST_MERCHANT',
-        amount: req.body.amount,
+        purchaseNumber: purchaseNumber,
+        amountStr: parseFloat(req.body.amount || '15.00').toFixed(2), // String con 2 decimales
         currency: 'PEN',
-        checkoutUrl: 'https://static-content-qas.vnforapps.com/v2/js/checkout.js?qa=true',
+        checkoutUrl: 'https://static-content.vnforapps.com/v2/js/checkout.js', // Producción para testing
+        staticContentBase: 'https://static-content.vnforapps.com', // Producción para testing
         testMode: true,
-        message: "Modo de prueba - Sesión simulada para Botón de Pago Web"
+        message: "Modo de prueba - Sesión simulada con URLs de producción"
     });
 });
 
@@ -81,6 +85,12 @@ router.post('/confirm', (req, res) => {
     });
 });
 
+// POST /api/niubiz/payment-response - Recibe respuesta POST del formulario de Niubiz
+router.post('/payment-response', (req, res) => {
+    console.log('📝 POST /payment-response - Respuesta de formulario Niubiz');
+    return niubizController.receivePaymentResponse(req, res);
+});
+
 // POST /api/niubiz/authorize - Autorizar transacción después del checkout
 router.post('/authorize', (req, res) => {
     console.log('📝 POST /authorize - Body:', req.body);
@@ -94,7 +104,7 @@ router.post('/authorize', (req, res) => {
         dataMap: {
             ACTION_CODE: "000",
             ACTION_DESCRIPTION: "Aprobado",
-            AMOUNT: req.body.amount,
+            AMOUNT: parseFloat(req.body.amount || '0').toFixed(2),
             CURRENCY: "PEN",
             TRANSACTION_ID: `TXN_TEST_${Date.now()}`,
             PURCHASE_NUMBER: req.body.purchaseNumber,

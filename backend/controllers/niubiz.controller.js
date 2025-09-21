@@ -2,6 +2,9 @@
 require('dotenv').config();
 const axios = require('axios');
 
+// Almacén temporal para datos de sesión (en producción usar Redis)
+const sessionStore = new Map();
+
 // Función para limpiar comillas de las variables de entorno
 function cleanEnvVar(value) {
     if (!value) return value;
@@ -10,7 +13,7 @@ function cleanEnvVar(value) {
 }
 
 const {
-    NIUBIZ_BASE = 'https://apisandbox.vnforappstest.com', // sandbox por defecto
+    NIUBIZ_BASE = 'https://apiprod.vnforapps.com', // producción por defecto para testing
     NIUBIZ_USER: RAW_NIUBIZ_USER,
     NIUBIZ_PASS: RAW_NIUBIZ_PASS,
     NIUBIZ_MERCHANT: RAW_NIUBIZ_MERCHANT,
@@ -21,19 +24,6 @@ const NIUBIZ_USER = cleanEnvVar(RAW_NIUBIZ_USER);
 const NIUBIZ_PASS = cleanEnvVar(RAW_NIUBIZ_PASS);
 const NIUBIZ_MERCHANT = cleanEnvVar(RAW_NIUBIZ_MERCHANT);
 
-// Debug: verificar que las credenciales se carguen correctamente
-console.log('🔧 Niubiz Config:', {
-    base: NIUBIZ_BASE,
-    user: NIUBIZ_USER ? `${NIUBIZ_USER.substring(0, 5)}...` : 'MISSING',
-    pass: NIUBIZ_PASS ? `${NIUBIZ_PASS.substring(0, 3)}...` : 'MISSING',
-    merchant: NIUBIZ_MERCHANT ? `${NIUBIZ_MERCHANT.substring(0, 3)}...` : 'MISSING'
-});
-
-// Debug adicional: verificar caracteres especiales en la contraseña
-console.log('🔍 Password length:', NIUBIZ_PASS ? NIUBIZ_PASS.length : 0);
-console.log('🔍 Password contains #:', NIUBIZ_PASS ? NIUBIZ_PASS.includes('#') : false);
-console.log('🔍 Raw credentials string length:', NIUBIZ_USER && NIUBIZ_PASS ? `${NIUBIZ_USER}:${NIUBIZ_PASS}`.length : 0);
-
 // ---- helpers ----
 function buildPurchaseNumber() {
     // 10 dígitos. Ajusta si tu comercio define otro esquema.
@@ -41,26 +31,13 @@ function buildPurchaseNumber() {
 }
 
 async function getAccessToken() {
-    console.log('🔑 Obteniendo token de acceso...');
-    console.log('🔍 Environment mode:', NIUBIZ_BASE.includes('sandbox') ? 'SANDBOX' : 'PRODUCTION');
-
-    // Verificar que las credenciales existan
     if (!NIUBIZ_USER || !NIUBIZ_PASS) {
         throw new Error('Credenciales Niubiz no configuradas correctamente');
     }
 
     const credentials = `${NIUBIZ_USER}:${NIUBIZ_PASS}`;
     const basic = Buffer.from(credentials).toString('base64');
-
-    console.log('🔍 Credentials verificadas:', {
-        userLength: NIUBIZ_USER.length,
-        passLength: NIUBIZ_PASS.length,
-        credentialsLength: credentials.length,
-        base64Length: basic.length
-    });
-
     const url = `${NIUBIZ_BASE}/api.security/v1/security`;
-    console.log('🌐 URL:', url);
 
     try {
         const response = await axios.get(url, {
@@ -71,26 +48,9 @@ async function getAccessToken() {
             timeout: 10000,
         });
 
-        console.log('✅ Token obtenido exitosamente');
         return response.data;
     } catch (error) {
-        console.error('❌ Error obteniendo token:', {
-            status: error.response?.status,
-            statusText: error.response?.statusText,
-            data: error.response?.data,
-            message: error.message,
-            url: url
-        });
-
-        // Si es error 401, verificar si las credenciales están configuradas correctamente
-        if (error.response?.status === 401) {
-            console.error('🚨 Error 401: Credenciales inválidas o no autorizadas');
-            console.error('💡 Verificar:');
-            console.error('   - Usuario y contraseña correctos');
-            console.error('   - Comercio habilitado en Niubiz');
-            console.error('   - URL correcta (sandbox vs producción)');
-        }
-
+        console.error('❌ Error obteniendo token:', error.response?.status, error.message);
         throw error;
     }
 }
@@ -103,33 +63,31 @@ async function getAccessToken() {
  */
 exports.createSession = async (req, res) => {
     try {
-        console.log('🚀 Iniciando createSession...');
-        console.log('📝 Body recibido:', req.body);
+        console.log('🚀 createSession iniciado');
 
-        const { amount, currency = 'PEN', customer = {} } = req.body || {};
+        const { amount, currency = 'PEN', customer = {}, formData = {} } = req.body || {};
         if (!amount) {
-            console.log('❌ Amount faltante');
             return res.status(400).json({ error: 'amount requerido' });
         }
 
         if (!NIUBIZ_USER || !NIUBIZ_PASS || !NIUBIZ_MERCHANT) {
-            console.log('❌ Credenciales faltantes');
             return res.status(500).json({ error: 'Credenciales Niubiz no configuradas' });
         }
 
-        console.log('🔑 Obteniendo token de acceso...');
         const accessToken = await getAccessToken();
 
-        // Log para verificar IP recibida
-        console.log('🌐 IP recibida del frontend:', req.body.clientIp);
-        console.log('🌐 IP del servidor (req.ip):', req.ip);
+        const FRONTEND_URL = process.env.FRONTEND_URL || 'https://gameztorepremios.com';
+        const actionBaseUrl = 'https://gameztorepremios.com';
+        const baseUrl = FRONTEND_URL;
 
-        // Payload según documentación oficial del Botón de Pago Web
         const payload = {
             channel: "web",
             amount: parseFloat(amount),
             antifraud: {
-                clientIp: req.body.clientIp || req.ip,
+                clientIp: req.headers['x-forwarded-for'] ||
+                    req.connection.remoteAddress ||
+                    req.socket.remoteAddress ||
+                    req.connection.socket.remoteAddress,
                 merchantDefineData: {
                     MDD4: customer.email || `${customer.dni}@gameztore.com`,
                     MDD32: customer.email || `${customer.dni}@gameztore.com`,
@@ -138,19 +96,17 @@ exports.createSession = async (req, res) => {
                 }
             },
             dataMap: {
-                cardholderCity: customer.ciudad || "Lima",
+                cardholderCity: customer.ciudad || "ICA",
                 cardholderCountry: "PE",
-                cardholderAddress: customer.direccion || "Av Jose Pardo 831",
+                cardholderAddress: customer.direccion || "Av los Maestros 206 INT 158",
                 cardholderPostalCode: customer.codigoPostal || "15074",
-                cardholderState: "LIM",
+                cardholderState: customer.ciudad || "ICA",
                 cardholderPhoneNumber: customer.telefono || "987654321"
-            }
+            },
+            timeoutUrl: `${baseUrl}/pay?status=timeout`,
         };
 
-        console.log('📦 Payload:', JSON.stringify(payload, null, 2));
-
         const url = `${NIUBIZ_BASE}/api.ecommerce/v2/ecommerce/token/session/${NIUBIZ_MERCHANT}`;
-        console.log('🌐 URL de sesión:', url);
 
         const { data } = await axios.post(url, payload, {
             headers: {
@@ -160,30 +116,53 @@ exports.createSession = async (req, res) => {
             timeout: 15000,
         });
 
-        console.log('✅ Respuesta de Niubiz:', JSON.stringify(data, null, 2));
+        console.log('✅ Sesión creada exitosamente');
+
+        const purchaseNumber = buildPurchaseNumber();
+
+        sessionStore.set(purchaseNumber, {
+            formData,
+            amount: parseFloat(amount),
+            currency,
+            customer,
+            timestamp: new Date().toISOString()
+        });
+
+        const currentTime = Date.now();
+        const niubizTime = data.expirationTime;
+        const isDuration = niubizTime < 86400000;
+
+        let finalExpirationTime;
+        if (!isDuration) {
+            const maxValidExpiration = currentTime + (10 * 60 * 1000);
+            finalExpirationTime = Math.min(niubizTime, maxValidExpiration);
+        } else {
+            finalExpirationTime = currentTime + niubizTime;
+        }
 
         const resp = {
             sessionKey: data.sessionKey,
-            expirationTime: data.expirationTime,
+            expirationTime: finalExpirationTime,
             merchantId: NIUBIZ_MERCHANT,
-            amount: amount,
+            purchaseNumber: purchaseNumber,
+            amountStr: parseFloat(amount).toFixed(2),
             currency: currency,
-            // URL del script de checkout según documentación oficial
+            apiBase: NIUBIZ_BASE,
+            staticContentBase: NIUBIZ_BASE.includes('sandbox')
+                ? 'https://static-content-qas.vnforapps.com'
+                : 'https://static-content.vnforapps.com',
             checkoutUrl: NIUBIZ_BASE.includes('sandbox')
-                ? 'https://static-content-qas.vnforapps.com/v2/js/checkout.js?qa=true'
-                : 'https://static-content.vnforapps.com/v2/js/checkout.js'
+                ? 'https://static-content-qas.vnforapps.com/env/sandbox/js/checkout.js'
+                : 'https://static-content.vnforapps.com/v2/js/checkout.js',
+            action: `${actionBaseUrl}/api/niubiz/payment-response?purchaseNumber=${purchaseNumber}`,
+            timeoutUrl: `${baseUrl}/pay?status=timeout`,
+            errorUrl: `${baseUrl}/pay?status=error`,
+            formData: formData
         };
 
-        console.log('📤 Respuesta final:', resp);
         return res.json(resp);
     } catch (err) {
-        console.error('❌ Niubiz createSession error completo:', {
-            message: err.message,
-            status: err.response?.status,
-            statusText: err.response?.statusText,
-            data: err.response?.data,
-            stack: err.stack
-        });
+        console.error('❌ Error createSession:', err.message);
         return res.status(400).json({
             error: 'Error creando sesión de pago',
             details: err.response?.data || err.message
@@ -197,23 +176,21 @@ exports.createSession = async (req, res) => {
  */
 exports.authorizeTransaction = async (req, res) => {
     try {
-        console.log('🚀 Iniciando authorizeTransaction...');
-        console.log('📝 Body recibido:', req.body);
+        console.log('🚀 authorizeTransaction iniciado');
 
         const {
-            transactionToken,
+            tokenId,
             purchaseNumber,
             amount,
             currency = 'PEN'
         } = req.body || {};
 
-        if (!transactionToken || !purchaseNumber || !amount) {
+        if (!tokenId || !purchaseNumber || !amount) {
             return res.status(400).json({
-                error: 'transactionToken, purchaseNumber y amount son requeridos'
+                error: 'tokenId, purchaseNumber y amount son requeridos'
             });
         }
 
-        // Validar que purchaseNumber sea numérico y máximo 12 dígitos
         if (!/^\d{1,12}$/.test(purchaseNumber)) {
             return res.status(400).json({
                 error: 'purchaseNumber debe ser numérico con máximo 12 dígitos'
@@ -222,12 +199,11 @@ exports.authorizeTransaction = async (req, res) => {
 
         const accessToken = await getAccessToken();
 
-        // Formato v3 compatible: tokenId fuera de order
         const payload = {
             channel: "web",
             captureType: "manual",
             countable: true,
-            tokenId: transactionToken,
+            tokenId: tokenId,
             order: {
                 purchaseNumber: purchaseNumber,
                 amount: parseFloat(amount),
@@ -235,10 +211,7 @@ exports.authorizeTransaction = async (req, res) => {
             }
         };
 
-        console.log('📦 Authorization Payload:', JSON.stringify(payload, null, 2));
-
         const url = `${NIUBIZ_BASE}/api.authorization/v3/authorization/ecommerce/${NIUBIZ_MERCHANT}`;
-        console.log('🌐 URL de autorización:', url);
 
         const { data } = await axios.post(url, payload, {
             headers: {
@@ -248,18 +221,21 @@ exports.authorizeTransaction = async (req, res) => {
             timeout: 15000,
         });
 
-        console.log('✅ Respuesta de autorización:', JSON.stringify(data, null, 2));
+        console.log('✅ Autorización exitosa');
         return res.json(data);
     } catch (err) {
-        console.error('❌ Niubiz authorize error completo:', {
-            message: err.message,
-            status: err.response?.status,
-            statusText: err.response?.statusText,
-            data: err.response?.data
-        });
+        console.error('❌ Error autorización:', err.message);
+
+        const errorData = err.response?.data || {};
+        const actionCode = errorData.data?.ACTION_CODE || 'unknown';
+        const actionDescription = errorData.data?.ACTION_DESCRIPTION || err.message;
+
         return res.status(400).json({
             error: 'Error autorizando transacción',
-            details: err.response?.data || err.message
+            actionCode: actionCode,
+            actionDescription: actionDescription,
+            details: errorData,
+            originalError: err.message
         });
     }
 };
@@ -270,6 +246,104 @@ exports.authorizeTransaction = async (req, res) => {
  * POST /api/niubiz/yape/create (redirige a createSession para compatibilidad)
  */
 exports.createYape = exports.createSession;
+
+/**
+ * POST /api/niubiz/payment-response
+ * Recibe la respuesta POST del formulario de pago de Niubiz
+ * según documentación oficial del Botón de Pago App
+ */
+exports.receivePaymentResponse = async (req, res) => {
+    try {
+        console.log('📝 Respuesta recibida de Niubiz');
+
+        const { transactionToken, customerEmail, channel, url } = req.body || {};
+        const purchaseNumber = req.query.purchaseNumber;
+
+        if (!transactionToken) {
+            return res.status(400).json({ error: 'transactionToken requerido' });
+        }
+
+        const sessionData = purchaseNumber ? sessionStore.get(purchaseNumber) : null;
+
+        // PagoEfectivo
+        if (channel === 'pagoefectivo') {
+            const params = new URLSearchParams({
+                status: 'pagoefectivo',
+                cipCode: transactionToken,
+                url: url || '',
+                purchaseNumber: purchaseNumber || ''
+            });
+
+            if (sessionData) {
+                params.append('amount', sessionData.amount.toString());
+                params.append('currency', sessionData.currency);
+                if (sessionData.formData) {
+                    params.append('formData', JSON.stringify(sessionData.formData));
+                }
+            }
+
+            const redirectUrl = `${process.env.FRONTEND_URL || 'https://gameztorepremios.com'}/pay?${params.toString()}`;
+            return res.redirect(redirectUrl);
+        }
+
+        // Yape
+        if (channel === 'yape' || channel === 'wallet') {
+            console.log('📱 Pago Yape detectado');
+
+            const params = new URLSearchParams({
+                status: 'yape_success',
+                transactionToken: transactionToken,
+                customerEmail: customerEmail || '',
+                channel: 'yape',
+                purchaseNumber: purchaseNumber || ''
+            });
+
+            if (sessionData) {
+                params.append('amount', sessionData.amount.toString());
+                params.append('currency', sessionData.currency);
+                if (sessionData.formData) {
+                    params.append('formData', JSON.stringify(sessionData.formData));
+                }
+                sessionStore.delete(purchaseNumber);
+            }
+
+            const redirectUrl = `${process.env.FRONTEND_URL || 'https://gameztorepremios.com'}/pay?${params.toString()}`;
+            return res.redirect(redirectUrl);
+        }
+
+        // Tarjetas - Sin autorización automática
+        console.log('💳 Pago con tarjeta detectado');
+
+        const params = new URLSearchParams({
+            status: 'success',
+            transactionToken: transactionToken,
+            customerEmail: customerEmail || '',
+            channel: channel || 'web',
+            purchaseNumber: purchaseNumber || ''
+        });
+
+        if (sessionData) {
+            params.append('amount', sessionData.amount.toString());
+            params.append('currency', sessionData.currency);
+            if (sessionData.formData) {
+                params.append('formData', JSON.stringify(sessionData.formData));
+            }
+            sessionStore.delete(purchaseNumber);
+        }
+
+        const redirectUrl = `${process.env.FRONTEND_URL || 'https://gameztorepremios.com'}/pay?${params.toString()}`;
+
+        console.log('🔄 Redirigiendo al frontend');
+        return res.redirect(redirectUrl);
+
+    } catch (error) {
+        console.error('❌ Error procesando respuesta:', error.message);
+        return res.status(500).json({
+            error: 'Error procesando respuesta de pago',
+            details: error.message
+        });
+    }
+};
 
 /**
  * GET /api/niubiz/yape/status (no se necesita polling en Botón de Pago Web)

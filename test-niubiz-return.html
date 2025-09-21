@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Niubiz Return</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Niubiz Return Flow</h1>
+    
+    <div class="warning">
+        <strong>⚠️ Importante:</strong> Esta página simula diferentes tipos de retorno que puede enviar Niubiz.
+        Usa estos tests para verificar que el componente NiubizReturn maneja correctamente todos los casos.
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test 1: Retorno Exitoso con Parámetros URL</h2>
+        <p>Simula un retorno exitoso de Niubiz con todos los parámetros necesarios.</p>
+        <button onclick="testSuccessReturn()">Probar Retorno Exitoso</button>
+        <pre id="success-params"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>❌ Test 2: Retorno con Error</h2>
+        <p>Simula un retorno con error de Niubiz.</p>
+        <button onclick="testErrorReturn()">Probar Retorno con Error</button>
+        <pre id="error-params"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>📭 Test 3: Retorno Sin Parámetros</h2>
+        <p>Simula un retorno de Niubiz sin parámetros (caso problemático actual).</p>
+        <button onclick="testEmptyReturn()">Probar Retorno Vacío</button>
+        <pre id="empty-params"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Test 4: Retorno con SessionStorage</h2>
+        <p>Simula datos guardados en sessionStorage para casos donde la URL no trae parámetros.</p>
+        <button onclick="testSessionStorageReturn()">Probar con SessionStorage</button>
+        <pre id="storage-params"></pre>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:5173/app-webpremios/pay';
+        
+        function testSuccessReturn() {
+            const params = {
+                transactionToken: 'abc123def456ghi789jkl012mno345pqr',
+                purchaseNumber: '1703123456789',
+                amount: '15.00',
+                actionCode: '000',
+                authorizationCode: 'AUTH123456'
+            };
+            
+            document.getElementById('success-params').textContent = JSON.stringify(params, null, 2);
+            
+            const url = `${baseUrl}?${new URLSearchParams(params)}`;
+            console.log('🎯 Abriendo URL de éxito:', url);
+            window.open(url, '_blank');
+        }
+        
+        function testErrorReturn() {
+            const params = {
+                errorCode: '101',
+                actionCode: '101',
+                amount: '15.00'
+            };
+            
+            document.getElementById('error-params').textContent = JSON.stringify(params, null, 2);
+            
+            const url = `${baseUrl}?${new URLSearchParams(params)}`;
+            console.log('❌ Abriendo URL de error:', url);
+            window.open(url, '_blank');
+        }
+        
+        function testEmptyReturn() {
+            document.getElementById('empty-params').textContent = 'Sin parámetros - URL limpia';
+            
+            console.log('📭 Abriendo URL vacía:', baseUrl);
+            window.open(baseUrl, '_blank');
+        }
+        
+        function testSessionStorageReturn() {
+            const mockData = {
+                transactionToken: 'stored123def456ghi789jkl012mno345xyz',
+                purchaseNumber: '1703123456999',
+                amount: '15.00',
+                source: 'sessionStorage_test'
+            };
+            
+            document.getElementById('storage-params').textContent = JSON.stringify(mockData, null, 2);
+            
+            // Simular que se guarda en sessionStorage
+            localStorage.setItem('test_storage', JSON.stringify(mockData));
+            
+            // Abrir una ventana que puede usar este dato
+            const storageTestUrl = `${baseUrl}?test=storage`;
+            console.log('🔧 Abriendo URL con sessionStorage:', storageTestUrl);
+            
+            // Programar que se ejecute código para simular sessionStorage en la nueva ventana
+            const newWindow = window.open(storageTestUrl, '_blank');
+            
+            setTimeout(() => {
+                if (newWindow && !newWindow.closed) {
+                    try {
+                        newWindow.sessionStorage.setItem('niubizTransaction', JSON.stringify(mockData));
+                        console.log('✅ SessionStorage configurado en nueva ventana');
+                    } catch (e) {
+                        console.log('⚠️ No se pudo configurar sessionStorage:', e.message);
+                    }
+                }
+            }, 1000);
+        }
+        
+        // Información de depuración
+        console.log('🧪 Test Niubiz Return cargado');
+        console.log('🎯 URL base para tests:', baseUrl);
+    </script>
+</body>
+</html>

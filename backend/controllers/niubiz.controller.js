@@ -30,6 +30,20 @@ function buildPurchaseNumber() {
     return Date.now().toString().slice(-10);
 }
 
+// Validar códigos de acción según documentación oficial
+function validateActionCode(actionCode, status) {
+    const successCodes = ['000', '010']; // Códigos de autorización exitosa
+    const isAuthorized = status === 'Authorized';
+    const isSuccessCode = successCodes.includes(actionCode);
+    
+    return {
+        isSuccess: isAuthorized && isSuccessCode,
+        isAuthorized: isAuthorized,
+        isSuccessCode: isSuccessCode,
+        message: isAuthorized ? 'Transacción autorizada' : 'Transacción no autorizada'
+    };
+}
+
 async function getAccessToken() {
     if (!NIUBIZ_USER || !NIUBIZ_PASS) {
         throw new Error('Credenciales Niubiz no configuradas correctamente');
@@ -199,15 +213,23 @@ exports.authorizeTransaction = async (req, res) => {
 
         const accessToken = await getAccessToken();
 
+        // Payload según documentación oficial - tokenId DENTRO del objeto order
         const payload = {
             channel: "web",
             captureType: "manual",
             countable: true,
-            tokenId: tokenId,
             order: {
+                tokenId: tokenId,  // Movido DENTRO del objeto order
                 purchaseNumber: purchaseNumber,
                 amount: parseFloat(amount),
                 currency: currency
+            },
+            dataMap: {
+                urlAddress: "https://gameztorepremios.com",
+                serviceLocationCityName: "Lima",
+                serviceLocationCountrySubdivisionCode: "LIM", // ISO 3166-2
+                serviceLocationCountryCode: "PER", // ISO 3166-1 alpha-3
+                serviceLocationPostalCode: "15074"
             }
         };
 
@@ -221,19 +243,48 @@ exports.authorizeTransaction = async (req, res) => {
             timeout: 15000,
         });
 
-        console.log('✅ Autorización exitosa');
-        return res.json(data);
+        // Validar STATUS según documentación oficial
+        const status = data.dataMap?.STATUS;
+        const actionCode = data.dataMap?.ACTION_CODE;
+        const validation = validateActionCode(actionCode, status);
+        
+        console.log(`✅ Respuesta autorización - STATUS: ${status}, ACTION_CODE: ${actionCode}`);
+        
+        // Agregar información de validación a la respuesta
+        const response = {
+            ...data,
+            isAuthorized: validation.isAuthorized,
+            isSuccess: validation.isSuccess,
+            statusValidation: {
+                status: status,
+                actionCode: actionCode,
+                isSuccess: validation.isSuccess,
+                isAuthorized: validation.isAuthorized,
+                isSuccessCode: validation.isSuccessCode,
+                message: validation.message
+            }
+        };
+
+        return res.json(response);
     } catch (err) {
         console.error('❌ Error autorización:', err.message);
 
         const errorData = err.response?.data || {};
         const actionCode = errorData.data?.ACTION_CODE || 'unknown';
         const actionDescription = errorData.data?.ACTION_DESCRIPTION || err.message;
+        const status = errorData.data?.STATUS || 'Unknown';
 
+        // Determinar si es un error de CVV2 u otro específico
+        const isSuccessCode = ['000', '010'].includes(actionCode);
+        const isCvvError = actionDescription?.toLowerCase().includes('cvv');
+        
         return res.status(400).json({
             error: 'Error autorizando transacción',
             actionCode: actionCode,
             actionDescription: actionDescription,
+            status: status,
+            isSuccessCode: isSuccessCode,
+            isCvvError: isCvvError,
             details: errorData,
             originalError: err.message
         });

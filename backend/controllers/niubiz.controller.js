@@ -106,14 +106,20 @@ exports.createSession = async (req, res) => {
         const actionBaseUrl = 'https://gameztorepremios.com';
         const baseUrl = FRONTEND_URL;
 
+        // Obtener IP del cliente correctamente
+        const clientIp = req.headers['x-forwarded-for']?.split(',')[0] ||
+                        req.connection.remoteAddress ||
+                        req.socket.remoteAddress ||
+                        req.connection.socket.remoteAddress ||
+                        '127.0.0.1';
+
+        console.log('🌐 Cliente IP detectada:', clientIp);
+
         const payload = {
             channel: "web",
             amount: parseFloat(amount),
             antifraud: {
-                clientIp: req.headers['x-forwarded-for'] ||
-                    req.connection.remoteAddress ||
-                    req.socket.remoteAddress ||
-                    req.connection.socket.remoteAddress,
+                clientIp: clientIp,
                 merchantDefineData: {
                     MDD4: customer.email || `${customer.dni}@gameztore.com`,
                     MDD32: customer.email || `${customer.dni}@gameztore.com`,
@@ -122,15 +128,17 @@ exports.createSession = async (req, res) => {
                 }
             },
             dataMap: {
-                cardholderCity: customer.ciudad || "ICA",
+                cardholderCity: customer.ciudad || "Lima",
                 cardholderCountry: "PE",
                 cardholderAddress: customer.direccion || "Av los Maestros 206 INT 158",
                 cardholderPostalCode: customer.codigoPostal || "15074",
-                cardholderState: customer.ciudad || "ICA",
+                cardholderState: "LIM", // ISO 3166-2 para Lima
                 cardholderPhoneNumber: customer.telefono || "987654321"
             },
-            timeoutUrl: `${baseUrl}/pay?status=timeout`,
+            timeoutUrl: `${baseUrl}/pay?status=timeout`
         };
+
+        console.log('📦 Payload para Niubiz:', JSON.stringify(payload, null, 2));
 
         const url = `${NIUBIZ_BASE}/api.ecommerce/v2/ecommerce/token/session/${NIUBIZ_MERCHANT}`;
 
@@ -188,10 +196,21 @@ exports.createSession = async (req, res) => {
 
         return res.json(resp);
     } catch (err) {
-        console.error('❌ Error createSession:', err.message);
-        return res.status(400).json({
+        console.error('❌ Error createSession detallado:', {
+            message: err.message,
+            status: err.response?.status,
+            statusText: err.response?.statusText,
+            data: err.response?.data,
+            url: err.config?.url,
+            method: err.config?.method,
+            headers: err.config?.headers
+        });
+        
+        return res.status(err.response?.status || 500).json({
             error: 'Error creando sesión de pago',
-            details: err.response?.data || err.message
+            details: err.response?.data || err.message,
+            niubizStatus: err.response?.status,
+            niubizError: err.response?.data
         });
     }
 };
